@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, console.log(`Server started on Port ${PORT}`));
 
-//add middleware
+//add middlewares
 
 //add routes
 
