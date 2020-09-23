@@ -4,11 +4,12 @@ const { check, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
+const authController = require('../controllers/authcontrollers');
 const Shopkeeper = require('../models/shopkeeper');
 const { userInfo } = require('os');
 
 dotenv.config();
-router.post(
+/*router.post(
   '/signup',
   [
     //check('name', 'Name is required').not().isEmpty(),
@@ -106,5 +107,7 @@ router.post(
       res.status(500).send('server error');
     }
   },
-);
+);*/
+router.post('/signup', authController.post_signup);
+router.post('/login', authController.post_login);
 module.exports = router;
