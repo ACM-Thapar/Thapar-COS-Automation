@@ -3,7 +3,6 @@ const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const dotenv = require('dotenv');
 const Shopkeeper = require('../models/shopkeeper');
 module.exports.post_signup = async (req, res) => {
   const errors = validationResult(req);
@@ -27,8 +26,6 @@ module.exports.post_signup = async (req, res) => {
       shop: shop,
     });
 
-    const salt = await bcrypt.genSalt(10);
-    shopkeeper.password = await bcrypt.hash(password, salt);
     await shopkeeper.save();
     //saving the shopkeeper after hashing and salting the password
     //Return jsonwebToken
