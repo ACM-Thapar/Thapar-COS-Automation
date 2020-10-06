@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const shopkeeperSchema = new mongoose.Schema({
   name: {
@@ -42,6 +43,11 @@ shopkeeperSchema.pre('save', async function(next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
+
+// Sign JWT and return
+shopkeeperSchema.methods.getSignedJwtToken = function() {
+  return jwt.sign({ id: this._id }, process.env.JWTTOKEN);
+};
 
 const Shopkeeper = mongoose.model('shopkeepers', shopkeeperSchema);
 module.exports = Shopkeeper;

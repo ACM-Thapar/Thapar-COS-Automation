@@ -7,9 +7,11 @@ const User = require('../models/user');
 const userController = require('../controllers/usercontrollers');
 const { userInfo } = require('os');
 const passport = require('passport');
+const { protectUser } = require('../middleware/auth');
 
 router.post('/signup', userController.post_signup);
 router.post('/login', userController.post_login);
+router.get('/me', [protectUser], userController.getMe);
 
 // auth with google
 router.get(

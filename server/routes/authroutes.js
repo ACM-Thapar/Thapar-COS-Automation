@@ -7,9 +7,11 @@ const authController = require('../controllers/authcontrollers');
 const Shopkeeper = require('../models/shopkeeper');
 const { userInfo } = require('os');
 const passport = require('passport');
+const { protectShopkeeper } = require('../middleware/auth');
 
 router.post('/signup', authController.post_signup);
 router.post('/login', authController.post_login);
+router.get('/me', [protectShopkeeper], authController.getMe);
 
 // auth with google
 router.get(
