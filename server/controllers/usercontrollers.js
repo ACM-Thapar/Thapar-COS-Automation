@@ -1,10 +1,16 @@
-const express = require('express');
-const router = express.Router();
+// *Utils
 const { check, validationResult } = require('express-validator');
+
+// *NPM Packages
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+
+// *Models
 const User = require('../models/user');
 
+// @desc     Register User
+// @route    POST /api/user/signup
+// @access   Public
 module.exports.post_signup = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -28,25 +34,16 @@ module.exports.post_signup = async (req, res) => {
     });
 
     await user.save();
-    //saving the shopkeeper after hashing and salting the password
-    //Return jsonwebToken
-    const payload = {
-      user: {
-        _id: user._id,
-      },
-    };
-    jwt.sign(payload, process.env.JWTTOKEN, (err, token) => {
-      if (err) throw err;
-      else {
-        res.json({ token });
-      }
-    }); //generally kept 3600 ie 1hr but as now testing it is kept more change it before deployment
+    sendTokenResponse(user, 200, req, res);
   } catch (err) {
     console.log(err);
     res.status(500).send('server error');
   }
 };
 
+// @desc     Login User
+// @route    POST /api/user/login
+// @access   Public
 module.exports.post_login = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -64,20 +61,41 @@ module.exports.post_login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ errors: [{ msg: 'invalid credentials' }] });
     }
-    //Return jsonwebToken
-    const payload = {
-      user: {
-        _id: user._id,
-      },
-    };
-    jwt.sign(payload, process.env.JWTTOKEN, (err, token) => {
-      if (err) throw err;
-      else {
-        res.json({ token });
-      }
-    }); //generally kept 3600 ie 1hr but as now testing it is kept more change it before deployment
+    sendTokenResponse(user, 200, req, res);
   } catch (err) {
     console.log(err);
     res.status(500).send('server error');
   }
+};
+
+// @desc     Get current logged in user
+// @route    GET /api/user/me
+// @access   Private
+
+module.exports.getMe = async (req, res) => {
+  try {
+    console.log(req.user);
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        data: 'No user found',
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false, data: err });
+  }
+};
+
+// Get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, req, res) => {
+  // Create token
+  const token = user.getSignedJwtToken();
+  req.session.token = token;
+  res.status(statusCode).json({ success: true, token });
 };
