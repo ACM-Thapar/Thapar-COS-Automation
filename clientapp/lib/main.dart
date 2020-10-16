@@ -1,3 +1,4 @@
+import 'package:clientapp/LoginPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -22,6 +23,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return LoginPage();
   }
 }
