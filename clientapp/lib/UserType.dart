@@ -1,3 +1,4 @@
+import 'package:clientapp/Builder.dart';
 import 'package:flutter/material.dart';
 
 import 'PageResizing/Variables.dart';
@@ -105,8 +106,14 @@ class _UserTypeState extends State<UserType> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // print('working1');
-                        //TODO
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfileBuilder(
+                              type: false,
+                            ),
+                          ),
+                        );
                       },
                       child: Container(
                         alignment: Alignment.center,
@@ -121,8 +128,14 @@ class _UserTypeState extends State<UserType> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // print('working');
-                        //TODO
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfileBuilder(
+                              type: true,
+                            ),
+                          ),
+                        );
                       },
                       child: Container(
                         alignment: Alignment.center,

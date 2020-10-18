@@ -5,6 +5,8 @@ import 'PageResizing/Variables.dart';
 import 'PageResizing/WidgetResizing.dart';
 
 class ProfileBuilder extends StatefulWidget {
+  ProfileBuilder({this.type});
+  final bool type;
   @override
   _ProfileBuilderState createState() => _ProfileBuilderState();
 }
@@ -33,7 +35,7 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
               children: [
                 Container(
                   child: Text(
-                    'Shopkeeper Details',
+                    widget.type ? 'Shopkeeper Details' : 'User Details',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 41,
@@ -129,15 +131,18 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                     ),
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: 25, left: 95 / 3.6 * boxSizeH),
-                  child: Text(
-                    'Fill Shop Details',
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
+                widget.type
+                    ? Container(
+                        margin:
+                            EdgeInsets.only(top: 25, left: 95 / 3.6 * boxSizeH),
+                        child: Text(
+                          'Fill Shop Details',
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                      )
+                    : Container(),
               ],
             ),
           ),
