@@ -1,5 +1,5 @@
-import 'package:clientapp/Registeruserpage.dart';
-import 'package:clientapp/UserType.dart';
+import './Builder.dart';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -24,6 +24,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Registeruser();
+    return ProfileBuilder();
   }
 }
