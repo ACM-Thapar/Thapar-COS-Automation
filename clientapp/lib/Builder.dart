@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'PageResizing/Variables.dart';
@@ -24,6 +23,7 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Container(
+            width: 290 / 3.6 * boxSizeH,
             margin: EdgeInsets.only(
               top: 27 / 6.4 * boxSizeV,
               left: 35 / 3.6 * boxSizeH,
@@ -33,7 +33,7 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
               children: [
                 Container(
                   child: Text(
-                    'ShopKeeper Details',
+                    'Shopkeeper Details',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 41,
