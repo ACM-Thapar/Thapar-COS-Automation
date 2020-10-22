@@ -20,6 +20,10 @@ module.exports.post_signup = async (req, res) => {
   const { name, phone, email, password, hostel } = req.body;
 
   try {
+    // Domain check for thapar.edu
+    if (!email.includes('@thapar.edu')) {
+      return res.status(400).json('Enter a thapar edu email');
+    }
     let user = await User.findOne({ email: email });
     if (user) {
       return res.status(400).json('user already exists');
