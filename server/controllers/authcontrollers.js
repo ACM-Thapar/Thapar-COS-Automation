@@ -3,6 +3,8 @@ const { check, validationResult } = require('express-validator');
 
 // * NPM Packages
 const bcrypt = require('bcryptjs');
+const otpGenerator = require("otp-generator");
+const nodemailer = require('nodemailer');
 
 // * Models
 const Shopkeeper = require('../models/shopkeeper');
@@ -24,15 +26,41 @@ module.exports.post_signup = async (req, res) => {
       return res.status(400).json('user already exists');
     }
 
-    shopkeeper = new Shopkeeper({
-      name: name,
-      phone: phone,
-      email: email,
-      password: password,
-      shop: shop,
+    //Generating an otp
+    const otp = otpGenerator.generate(6, {
+      upperCase: false,
+      specialChars: false,
     });
+    console.log(otp);
+    const newValue = { name, phone, email, password, shop, otp: { code: otp } }
 
-    await shopkeeper.save();
+    shopkeeper = await Shopkeeper.create(newValue);
+
+    const message = `Thanks for registering! We will need to verify your email first. You can do so by entering ${shopkeeper.otp.code}. This code is valid for only next 15 minutes.`;
+
+    // create reusable transporter object using the default SMTP transport
+let transporter = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.TRANSPORTER_USER, // generated ethereal user
+    pass: process.env.TRANSPORTER_PASS, // generated ethereal password
+  },
+  tls: {
+      rejectUnauthorized: false
+  }
+});
+
+// send mail with defined transport object
+let info = transporter.sendMail({
+  from: '"Nodemailer Contact" <process.env.TRANSPORTER_USER>', // sender address
+  to: shopkeeper.email, // list of receivers
+  subject: "Verification OTP", // Subject line
+  text: message // plain text body
+});
+
+console.log("Message sent: %s", info.messageId);
 
     sendTokenResponse(shopkeeper, 200, req, res);
   } catch (err) {
@@ -63,6 +91,105 @@ module.exports.post_login = async (req, res) => {
       return res.status(400).json({ errors: [{ msg: 'invalid credentials' }] });
     }
     sendTokenResponse(shopkeeper, 200, req, res);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('server error');
+  }
+};
+
+// @desc     Verify Otp
+// @route    POST /api/auth/verify-otp
+// @access   Private
+module.exports.verifyOtp = async (req, res) => {
+
+  try {
+    const shopkeeper = await Shopkeeper.findById(req.user.id);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { otp } = req.body;
+
+    if (shopkeeper.verified === true) {
+      return res.status(400).json({ errors: [{ msg: 'Already verified' }] });
+    }
+
+    // Check if otp matches
+    const isMatch = await shopkeeper.matchOtp(otp);
+
+    if (!isMatch) {
+      return res.status(401).json({ errors: [{ msg: 'Invalid otp' }] });
+    }
+
+    const currentTime = new Date(Date.now());
+    if (shopkeeper.otp.validity < currentTime) {
+      return res.status(400).json({ errors: [{ msg: 'OTP has expired' }] });
+    }
+
+    shopkeeper.verified = true;
+    await shopkeeper.save({ validateBeforeSave: false });
+    return res.status(200).json({ message: "Sucessfully Verified" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('server error');
+  }
+};
+
+// @desc     Regenerate Otp
+// @route    PUT /api/auth/regenerate-otp
+// @access   Private
+module.exports.regenerateOtp = async (req, res) => {
+  try {
+    const shopkeeper = await Shopkeeper.findById(req.user.id);
+    if (!shopkeeper) {
+      return res.status(400).json({ errors: [{ msg: 'User does not exist' }] });
+    }
+
+    // if user is already verified
+    if (shopkeeper.verified === true) {
+      return res.status(400).json({ errors: [{ msg: 'User already verified' }] });
+    }
+
+    shopkeeper.otp.code = undefined;
+    shopkeeper.otp.validity = undefined;
+    const otp = otpGenerator.generate(6, {
+      upperCase: false,
+      specialChars: false,
+    });
+
+    console.log(otp);
+    const validity = new Date(Date.now() + 15 * 60 * 1000);
+    shopkeeper.otp.code = otp;
+    shopkeeper.otp.validity = validity;
+    await shopkeeper.save({ validateBeforeSave: false });
+    const message = `Thanks for registering! We will need to verify your email first. You can do so by entering ${shopkeeper.otp.code}. This code is valid for only next 15 minutes.`;
+
+     // create reusable transporter object using the default SMTP transport
+let transporter = nodemailer.createTransport({
+  host: "smtp.mailtrap.io",
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.TRANSPORTER_USER, // generated ethereal user
+    pass: process.env.TRANSPORTER_PASS, // generated ethereal password
+  },
+  tls: {
+      rejectUnauthorized: false
+  }
+});
+
+// send mail with defined transport object
+let info = transporter.sendMail({
+  from: '"Nodemailer Contact" <process.env.TRANSPORTER_USER>', // sender address
+  to: shopkeeper.email, // list of receivers
+  subject: "Verification OTP", // Subject line
+  text: message // plain text body
+});
+
+console.log("Message sent: %s", info.messageId);
+sendTokenResponse(shopkeeper, 200, req, res);
+
   } catch (err) {
     console.log(err);
     res.status(500).send('server error');
