@@ -11,6 +11,8 @@ const { protectUser } = require('../middleware/auth');
 
 router.post('/signup', userController.post_signup);
 router.post('/login', userController.post_login);
+router.post('/verify-otp', [protectUser], userController.verifyOtp);
+router.put('/regenerate-otp', [protectUser], userController.regenerateOtp);
 router.get('/me', [protectUser], userController.getMe);
 
 // auth with google
