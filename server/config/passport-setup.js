@@ -37,6 +37,10 @@ passport.use(
         done(null, user);
       } else {
         console.log(profile);
+        if (profile._json.hd !== 'thapar.edu') {
+          done(new Error('Must be a thapar edu account'));
+          return;
+        }
         let newUser = new User({
           email: profile._json.email,
           name: profile.displayName,
