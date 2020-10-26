@@ -46,6 +46,7 @@ passport.use(
           name: profile.displayName,
           password: profile.id,
           isGoogleUser: true,
+          verified: true,
         });
         newUser = await newUser.save();
         console.log('new user created \n' + newUser);
@@ -78,6 +79,7 @@ passport.use(
           name: profile.displayName,
           password: profile.id,
           isGoogleUser: true,
+          verified: true,
         });
         newUser = await newUser.save();
         console.log('new user created \n' + newUser);
