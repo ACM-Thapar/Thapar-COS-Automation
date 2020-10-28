@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
 const shopkeeperSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -24,10 +23,11 @@ const shopkeeperSchema = new mongoose.Schema({
     trim: true,
     minlength: 4,
   },
-  shop: {
-    type: String,
-    id: String,
-  },
+  /*shops: [{
+    name: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Shop'
+  }],*/
   isGoogleUser: {
     type: Boolean,
     default: false,

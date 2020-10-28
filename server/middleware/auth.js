@@ -52,7 +52,6 @@ exports.protectUser = async (req, res, next) => {
 // Protect routes for shopkeeper
 exports.protectShopkeeper = async (req, res, next) => {
   let token;
-
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
@@ -78,9 +77,6 @@ exports.protectShopkeeper = async (req, res, next) => {
     } else {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWTTOKEN);
-
-      console.log(decoded);
-
       req.user = await Shopkeeper.findById(decoded.id);
 
       next();

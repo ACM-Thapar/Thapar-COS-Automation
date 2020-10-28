@@ -1,12 +1,22 @@
 const mongoose = require('mongoose');
-const shop = new mongoose.Schema({
+const shopSchema = new mongoose.Schema({
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    require: true,
+    ref: 'shopkeepers',
+  },
+  /*shop_num:
+  {
+    type: String,
+    required: true,
+  },*/
   name: {
     type: String,
     required: true,
   },
   category: {
     type: String,
-    required: true,
+    required: false,
   },
   phone: {
     type: Number,
@@ -14,21 +24,7 @@ const shop = new mongoose.Schema({
     minlength: 10,
     maxlength: 10,
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-  },
-  shop_num: {
-    type: Number,
-    required: true,
-  },
-  shop: {
-    type: String,
-    id: String,
-  },
-  staus: {
+  status: {
     type: String,
     default: 'OPEN',
   },
@@ -44,6 +40,18 @@ const shop = new mongoose.Schema({
     type: Number,
     default: '',
   },
+  review: [
+    {
+      rating: {
+        type: Number,
+        min: 0,
+        max: 5,
+      },
+      text: {
+        type: String,
+      },
+    },
+  ],
   //array of objects
   inventory: [
     {
@@ -65,5 +73,5 @@ const shop = new mongoose.Schema({
     },
   ],
 });
-const Shop = mongoose.model('shops', shopschema);
+const Shop = mongoose.model('shops', shopSchema);
 module.exports = Shop;

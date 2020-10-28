@@ -13,7 +13,7 @@ require('dotenv').config({ path: __dirname + '/.env' });
 // *Routes
 const authroutes = require('./routes/authroutes.js');
 const userroutes = require('./routes/userroutes.js');
-
+const shoproutes = require('./routes/shoproutes.js');
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -60,7 +60,7 @@ app.use(passport.session());
 // *Routes
 app.use('/api/auth', authroutes);
 app.use('/api/user', userroutes);
-
+app.use('/api/shop', shoproutes);
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.log(`Error: ${err.message}`);
