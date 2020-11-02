@@ -23,16 +23,39 @@ const shopkeeperSchema = new mongoose.Schema({
     trim: true,
     minlength: 4,
   },
-  /*shops: [{
-    name: String,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Shop'
-  }],*/
+  // Added otp
+  otp: {
+    code: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    validity: {
+      type: Date,
+      default: new Date(Date.now() + 15 * 60 * 1000),
+    },
+  },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
+  shop: {
+    type: String,
+    id: String,
+  },
   isGoogleUser: {
     type: Boolean,
     default: false,
   },
 });
+
+// Match otp entered by the shopkeeper with otp stored in the database
+shopkeeperSchema.methods.matchOtp = function(enteredOtp) {
+  if (enteredOtp !== this.otp.code) {
+    return false;
+  }
+  return true;
+};
 
 // Encrypt password using bcrypt
 shopkeeperSchema.pre('save', async function(next) {
