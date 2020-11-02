@@ -12,7 +12,9 @@ const { protectShopkeeper } = require('../middleware/auth');
 
 //routes for SHOP
 router.route('/createShop').post(protectShopkeeper, shopController.create_shop);
-router.route('/updateShop').put(protectShopkeeper, shopController.update_shop);
+router
+  .route('/updateShop/:id')
+  .put(protectShopkeeper, shopController.update_shop);
 router.route('/myShops').get(protectShopkeeper, shopController.myshops);
 router.route('/deleteShop').get(protectShopkeeper, shopController.deleteshop);
 

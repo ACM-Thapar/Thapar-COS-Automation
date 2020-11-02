@@ -18,12 +18,6 @@ module.exports.create_shop = async (req, res) => {
 
   const { name, phone, timings, capacity, address } = req.body;
   try {
-    let check = await User.findOne(req.user._id);
-    if (check) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'User cannot create a shop' });
-    }
     let shops = await Shop.findOne({
       name: req.body.name,
       owner: req.user._id,
@@ -53,34 +47,37 @@ module.exports.create_shop = async (req, res) => {
 // Route to update existing shop profile
 module.exports.update_shop = async (req, res) => {
   const errors = validationResult(req);
-  const updates = Object.keys(req.body);
-  const allowed = [
-    'name',
-    'phone',
-    'status',
-    'timings',
-    'capacity',
-    'address',
-    'inventory',
-  ];
-  const isValid = updates.every(update => allowed.includes(update));
-  console.log(isValid);
-  if (isValid == false) {
-    return res.status(400).json('You cannot edit this value');
-  }
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+  const { name, phone, status, timings, capacity, address } = req.body;
+  const fields = {};
+  if (name) fields.name = name;
+  if (phone) fields.phone = phone;
+  if (status) fields.status = status;
+  if (timings) fields.timings = timings;
+  if (capacity) fields.capacity = capacity;
+  if (address) fields.address = address;
   try {
-    let shop = await Shop.findOneAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!shop) {
+    let update_shop = await Shop.findById(req.params.id);
+    //If shop does not exist in database
+    if (!update_shop) {
       return res.status(400).json('Shop Profile does not exist');
     }
+    //To check if current logged in user is the owner of the shop
+    if (update_shop.owner.toString() != req.user._id.toString()) {
+      return res.status(400).json('Only owner can update shop profile');
+    }
+    let shop = await Shop.findOneAndUpdate(
+      { owner: req.user._id },
+      {
+        new: true,
+      },
+      {
+        $set: fields,
+      },
+    );
 
-    await shop.save();
     res.status(200).send(shop);
   } catch (err) {
     console.log(err);
