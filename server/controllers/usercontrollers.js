@@ -1,5 +1,6 @@
 // *Utils
 const { check, validationResult } = require('express-validator');
+const sendEmail = require("../utils/sendEmail");
 
 // *NPM Packages
 const jwt = require('jsonwebtoken');
@@ -42,29 +43,11 @@ module.exports.post_signup = async (req, res) => {
     user = await User.create(newValue);
     const message = `Thanks for registering! We will need to verify your email first. You can do so by entering ${user.otp.code}. This code is valid for only next 15 minutes.`;
 
-    // create reusable transporter object using the default SMTP transport
-let transporter = nodemailer.createTransport({
-  host: "smtp.mailtrap.io",
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.TRANSPORTER_USER, // generated ethereal user
-    pass: process.env.TRANSPORTER_PASS, // generated ethereal password
-  },
-  tls: {
-      rejectUnauthorized: false
-  }
+await sendEmail({
+  email: user.email,
+  subject: "Verification OTP",
+  message,
 });
-
-// send mail with defined transport object
-let info = transporter.sendMail({
-  from: '"Nodemailer Contact" <process.env.TRANSPORTER_USER>', // sender address
-  to: user.email, // list of receivers
-  subject: "Verification OTP", // Subject line
-  text: message // plain text body
-});
-
-console.log("Message sent: %s", info.messageId);
 
     sendTokenResponse(user, 200, req, res);
   } catch (err) {
@@ -168,29 +151,12 @@ module.exports.regenerateOtp = async (req, res) => {
     await user.save({ validateBeforeSave: false });
     const message = `Thanks for registering! We will need to verify your email first. You can do so by entering ${user.otp.code}. This code is valid for only next 15 minutes.`;
 
-     // create reusable transporter object using the default SMTP transport
-let transporter = nodemailer.createTransport({
-  host: "smtp.mailtrap.io",
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.TRANSPORTER_USER, // generated ethereal user
-    pass: process.env.TRANSPORTER_PASS, // generated ethereal password
-  },
-  tls: {
-      rejectUnauthorized: false
-  }
-});
+    await sendEmail({
+      email: user.email,
+      subject: "Verification OTP",
+      message,
+    }); 
 
-// send mail with defined transport object
-let info = transporter.sendMail({
-  from: '"Nodemailer Contact" <process.env.TRANSPORTER_USER>', // sender address
-  to: user.email, // list of receivers
-  subject: "Verification OTP", // Subject line
-  text: message // plain text body
-});
-
-console.log("Message sent: %s", info.messageId);
 sendTokenResponse(user, 200, req, res);
 
   } catch (err) {
