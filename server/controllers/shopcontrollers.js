@@ -51,13 +51,7 @@ module.exports.update_shop = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   const { name, phone, status, timings, capacity, address } = req.body;
-  const fields = {};
-  if (name) fields.name = name;
-  if (phone) fields.phone = phone;
-  if (status) fields.status = status;
-  if (timings) fields.timings = timings;
-  if (capacity) fields.capacity = capacity;
-  if (address) fields.address = address;
+  const fields = req.body;
   try {
     let update_shop = await Shop.findById(req.params.id);
     //If shop does not exist in database
@@ -68,16 +62,10 @@ module.exports.update_shop = async (req, res) => {
     if (update_shop.owner.toString() != req.user._id.toString()) {
       return res.status(400).json('Only owner can update shop profile');
     }
-    let shop = await Shop.findOneAndUpdate(
-      { owner: req.user._id },
-      {
-        new: true,
-      },
-      {
-        $set: fields,
-      },
-    );
-
+   
+    let shop = await Shop.findByIdAndUpdate(req.params.id, req.body,
+       {new:true, runVaildators: true});
+    
     res.status(200).send(shop);
   } catch (err) {
     console.log(err);
