@@ -96,7 +96,7 @@ module.exports.myshops = async (req, res) => {
 module.exports.deleteshop = async (req, res) => {
   try {
     console.log(req.user._id);
-    const shop = await Shop.findOne({ owner: req.user._id });
+    const shop = await Shop.findByIdAndDelete(req.params.id);
     if (!shop) {
       return res.status(400).json({
         success: false,
@@ -109,4 +109,24 @@ module.exports.deleteshop = async (req, res) => {
     console.log(err);
     res.status(400).json({ success: false, data: err });
   }
+};
+
+//Getting all shops for DashBoard display
+module.exports.get_all=async(req,res) => {
+  try{
+    const allShops = await Shop.find({});
+    if(!allShops)
+    {
+      return res.status(400).json({
+        success: false,
+        data: 'No shop exist',
+      });
+    }
+    return res.status(200).json(allShops);
+  }catch(err)
+  {
+    console.log(err);
+    res.status(400).json({ success: false, data: err });
+  }
+
 };
