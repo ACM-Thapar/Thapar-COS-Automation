@@ -96,14 +96,17 @@ module.exports.myshops = async (req, res) => {
 module.exports.deleteshop = async (req, res) => {
   try {
     console.log(req.user._id);
-    const shop = await Shop.findByIdAndDelete(req.params.id);
-    if (!shop) {
+    let check_shop = await Shop.findById(req.params.id);
+    if (!check_shop) {
       return res.status(400).json({
         success: false,
         data: 'No shop exist',
       });
     }
-    await shop.remove();
+    if (check_shop.owner.toString() != req.user._id.toString()) {
+      return res.status(400).json('Only owner can delete shop profile');
+    }
+    let shop = await Shop.findByIdAndDelete(req.params.id);
     return res.status(200).json(shop);
   } catch (err) {
     console.log(err);
