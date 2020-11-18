@@ -49,6 +49,20 @@ const shopkeeperSchema = new mongoose.Schema({
   },
 });
 
+
+shopkeeperSchema.virtual('members', {
+  ref: 'Shop', // The model to use
+  localField: '_id', // Find people where `localField`
+  foreignField: 'owner', // is equal to `foreignField`
+  // If `justOne` is true, 'members' will be a single doc as opposed to
+  // an array. `justOne` is false by default.
+  justOne: false,
+  options: { sort: { name: -1 }, limit: 5 } 
+  
+});
+{ toJSON: { virtuals: true } toObject: { virtuals: true } }
+
+
 // Match otp entered by the shopkeeper with otp stored in the database
 shopkeeperSchema.methods.matchOtp = function(enteredOtp) {
   if (enteredOtp !== this.otp.code) {

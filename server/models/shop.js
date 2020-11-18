@@ -5,11 +5,6 @@ const shopSchema = new mongoose.Schema({
     require: true,
     ref: 'shopkeepers',
   },
-  /*shop_num:
-  {
-    type: String,
-    required: true,
-  },*/
   name: {
     type: String,
     required: true,
@@ -40,18 +35,9 @@ const shopSchema = new mongoose.Schema({
     type: Number,
     default: '',
   },
-  review: [
-    {
-      rating: {
-        type: Number,
-        min: 0,
-        max: 5,
-      },
-      text: {
-        type: String,
-      },
-    },
-  ],
+  shop_rating:{
+      type:Number
+  },
   //array of objects
   inventory: [
     {
@@ -73,5 +59,15 @@ const shopSchema = new mongoose.Schema({
     },
   ],
 });
+shopSchema.virtual('members', {
+  ref: 'Review', // The model to use
+  localField: 'shop_rating', // Find people where `localField`
+  foreignField: 'rating', // is equal to `foreignField`
+  // If `justOne` is true, 'members' will be a single doc as opposed to
+  // an array. `justOne` is false by default.
+  justOne: false, 
+});
+{ toJSON: { virtuals: true } toObject: { virtuals: true } }
+
 const Shop = mongoose.model('shops', shopSchema);
 module.exports = Shop;
