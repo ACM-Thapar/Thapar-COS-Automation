@@ -1,12 +1,17 @@
 const mongoose = require('mongoose');
-const shop = new mongoose.Schema({
+const shopSchema = new mongoose.Schema({
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    require: true,
+    ref: 'shopkeepers',
+  },
   name: {
     type: String,
     required: true,
   },
   category: {
     type: String,
-    required: true,
+    required: false,
   },
   phone: {
     type: Number,
@@ -14,21 +19,7 @@ const shop = new mongoose.Schema({
     minlength: 10,
     maxlength: 10,
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-  },
-  shop_num: {
-    type: Number,
-    required: true,
-  },
-  shop: {
-    type: String,
-    id: String,
-  },
-  staus: {
+  status: {
     type: String,
     default: 'OPEN',
   },
@@ -43,6 +34,9 @@ const shop = new mongoose.Schema({
   capacity: {
     type: Number,
     default: '',
+  },
+  shop_rating:{
+      type:Number
   },
   //array of objects
   inventory: [
@@ -65,5 +59,15 @@ const shop = new mongoose.Schema({
     },
   ],
 });
-const Shop = mongoose.model('shops', shopschema);
+shopSchema.virtual('members', {
+  ref: 'Review', // The model to use
+  localField: 'shop_rating', // Find people where `localField`
+  foreignField: 'rating', // is equal to `foreignField`
+  // If `justOne` is true, 'members' will be a single doc as opposed to
+  // an array. `justOne` is false by default.
+  justOne: false, 
+});
+{ toJSON: { virtuals: true } toObject: { virtuals: true } }
+
+const Shop = mongoose.model('shops', shopSchema);
 module.exports = Shop;
