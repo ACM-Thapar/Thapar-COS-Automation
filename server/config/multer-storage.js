@@ -17,7 +17,7 @@ CustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
     if (err) return cb(err);
     getUri(file.stream, file).then(uri => {
       cloudinary.uploader
-        .unsigned_upload(uri, 'peih39el')
+        .unsigned_upload(uri, 'vfkoh0tw')
         .then(result => {
           cb(null, { url: result.secure_url });
         })

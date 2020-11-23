@@ -64,7 +64,7 @@ exports.protectShopkeeper = async (req, res, next) => {
   }
 
   // Make sure token exists
-  if (!token && req.user === null) {
+  if (!token && (req.user === null || req.user === undefined)) {
     return res.status(401).json({
       success: false,
       message: 'Not authorized to access this route',
