@@ -19,7 +19,7 @@ module.exports.create_shop = async (req, res) => {
   const { name, phone, timings, capacity, address } = req.body;
   try {
     let shops = await Shop.findOne({
-      name: req.body.name,
+      name,
       owner: req.user._id,
     });
     if (shops) {
@@ -28,12 +28,11 @@ module.exports.create_shop = async (req, res) => {
 
     shops = new Shop({
       owner: req.user._id,
-      name: req.body.name,
-      /* shop_num:shop_num,*/
-      phone: phone,
-      timings: timings,
-      capacity: capacity,
-      address: address,
+      name,
+      phone,
+      timings,
+      capacity,
+      address,
     });
     console.log(shops);
     await shops.save();
@@ -62,10 +61,12 @@ module.exports.update_shop = async (req, res) => {
     if (update_shop.owner.toString() != req.user._id.toString()) {
       return res.status(400).json('Only owner can update shop profile');
     }
-   
-    let shop = await Shop.findByIdAndUpdate(req.params.id, req.body,
-       {new:true, runVaildators: true});
-    
+
+    let shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runVaildators: true,
+    });
+
     res.status(200).send(shop);
   } catch (err) {
     console.log(err);
@@ -114,21 +115,18 @@ module.exports.deleteshop = async (req, res) => {
 };
 
 //Getting all shops for DashBoard display
-module.exports.get_all=async(req,res) => {
-  try{
+module.exports.get_all = async (req, res) => {
+  try {
     const allShops = await Shop.find({});
-    if(!allShops)
-    {
+    if (!allShops) {
       return res.status(400).json({
         success: false,
         data: 'No shop exist',
       });
     }
     return res.status(200).json(allShops);
-  }catch(err)
-  {
+  } catch (err) {
     console.log(err);
     res.status(400).json({ success: false, data: err });
   }
-
 };
