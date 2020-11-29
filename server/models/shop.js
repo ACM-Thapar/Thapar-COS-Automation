@@ -46,11 +46,9 @@ const shopSchema = new mongoose.Schema(
 shopSchema.index({ owner: 1 });
 
 shopSchema.virtual('members', {
-  ref: 'Review', // The model to use
-  localField: 'shop_rating', // Find people where `localField`
-  foreignField: 'rating', // is equal to `foreignField`
-  // If `justOne` is true, 'members' will be a single doc as opposed to
-  // an array. `justOne` is false by default.
+  ref: 'Review',
+  localField: 'shop_rating',
+  foreignField: 'rating',
   justOne: false,
 });
 
@@ -59,6 +57,12 @@ shopSchema.virtual('inventory', {
   localField: '_id',
   foreignField: 'shop',
   justOne: false,
+});
+
+shopSchema.pre('remove', async function(next) {
+  console.log('Inventory being cleared...');
+  await this.model('Inventory').deleteMany({ shop: this._id });
+  next();
 });
 
 const Shop = mongoose.model('shops', shopSchema);

@@ -117,3 +117,35 @@ module.exports.updateInventoryProduct = async (req, res) => {
     res.status(500).send('server error');
   }
 };
+
+// @desc     Delete a product from inventory
+// @route    DELETE /api/inventory/delete-product/:id
+// @access   Private
+module.exports.deleteInventoryProduct = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  try {
+    // TODO Remove image from Cloud if possible
+    let inventory = await Inventory.findById(req.params.id).lean();
+    // Check if the product exists
+    if (!inventory) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product doesn't exist" });
+    }
+    // Check if the current user is the owner
+    if (!inventory.shopOwner.equals(req.user._id)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorised to perform this action',
+      });
+    }
+    inventory = await Inventory.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: 'deleted sucessfully' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('server error');
+  }
+};

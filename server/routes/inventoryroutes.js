@@ -13,6 +13,7 @@ const {
   addInventory,
   markInventoryAvailablity,
   updateInventoryProduct,
+  deleteInventoryProduct,
 } = require('../controllers/inventorycontrollers');
 
 // * Middleware
@@ -55,5 +56,10 @@ router.put(
   '/update-product/:id',
   [protectShopkeeper, upload],
   updateInventoryProduct,
+);
+router.delete(
+  '/delete-product/:id',
+  [protectShopkeeper],
+  deleteInventoryProduct,
 );
 module.exports = router;

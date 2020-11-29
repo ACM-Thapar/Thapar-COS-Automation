@@ -24,7 +24,7 @@ module.exports.post_signup = async (req, res) => {
   const { name, phone, email, password, shop } = req.body;
 
   try {
-    let shopkeeper = await Shopkeeper.findOne({ email: email });
+    let shopkeeper = await Shopkeeper.findOne({ email: email }).lean();
     if (shopkeeper) {
       return res.status(400).json('user already exists');
     }
