@@ -1,20 +1,23 @@
 const express = require('express');
-const router = express.Router();
-const { check, validationResult } = require('express-validator');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+
+// * Controllers
 const shopController = require('../controllers/shopcontrollers');
-const Shopkeeper = require('../models/shopkeeper');
-const Shop = require('../models/shop');
-const { userInfo } = require('os');
-const passport = require('passport');
+
+// * Middleware
 const { protectShopkeeper } = require('../middleware/auth');
 
-//routes for SHOP
+// * API Endpoints -->
+const router = express.Router();
+
 router.route('/createShop').post(protectShopkeeper, shopController.create_shop);
-router.route('/updateShop/:id').put(protectShopkeeper, shopController.update_shop);
+router
+  .route('/updateShop/:id')
+  .put(protectShopkeeper, shopController.update_shop);
 router.route('/myShops').get(protectShopkeeper, shopController.myshops);
-router.route('/deleteShop/:id').get(protectShopkeeper, shopController.deleteshop);
+router
+  .route('/deleteShop/:id')
+  .delete(protectShopkeeper, shopController.deleteshop);
 router.route('/getAllShops').get(shopController.get_all);
+router.route('/get-shop/:id').get(shopController.getShopById);
 
 module.exports = router;

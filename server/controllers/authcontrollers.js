@@ -1,10 +1,10 @@
 // * Utils
 const { check, validationResult } = require('express-validator');
-const sendEmail = require("../utils/sendEmail");
+const sendEmail = require('../utils/sendEmail');
 
 // * NPM Packages
 const bcrypt = require('bcryptjs');
-const otpGenerator = require("otp-generator");
+const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
@@ -24,7 +24,7 @@ module.exports.post_signup = async (req, res) => {
   const { name, phone, email, password, shop } = req.body;
 
   try {
-    let shopkeeper = await Shopkeeper.findOne({ email: email });
+    let shopkeeper = await Shopkeeper.findOne({ email: email }).lean();
     if (shopkeeper) {
       return res.status(400).json('user already exists');
     }
@@ -35,14 +35,14 @@ module.exports.post_signup = async (req, res) => {
       specialChars: false,
     });
     console.log(otp);
-    const newValue = { name, phone, email, password, shop, otp: { code: otp } }
+    const newValue = { name, phone, email, password, shop, otp: { code: otp } };
 
     shopkeeper = await Shopkeeper.create(newValue);
     const message = `Thanks for registering! We will need to verify your email first. You can do so by entering ${shopkeeper.otp.code}. This code is valid for only next 15 minutes.`;
 
     await sendEmail({
       email: shopkeeper.email,
-      subject: "Verification OTP",
+      subject: 'Verification OTP',
       message,
     });
 
@@ -85,7 +85,6 @@ module.exports.post_login = async (req, res) => {
 // @route    POST /api/auth/verify-otp
 // @access   Private
 module.exports.verifyOtp = async (req, res) => {
-
   try {
     const shopkeeper = await Shopkeeper.findById(req.user.id);
 
@@ -113,7 +112,7 @@ module.exports.verifyOtp = async (req, res) => {
 
     shopkeeper.verified = true;
     await shopkeeper.save({ validateBeforeSave: false });
-    return res.status(200).json({ message: "Sucessfully Verified" });
+    return res.status(200).json({ message: 'Sucessfully Verified' });
   } catch (err) {
     console.log(err);
     res.status(500).send('server error');
@@ -132,7 +131,9 @@ module.exports.regenerateOtp = async (req, res) => {
 
     // if user is already verified
     if (shopkeeper.verified === true) {
-      return res.status(400).json({ errors: [{ msg: 'User already verified' }] });
+      return res
+        .status(400)
+        .json({ errors: [{ msg: 'User already verified' }] });
     }
 
     shopkeeper.otp.code = undefined;
@@ -151,12 +152,11 @@ module.exports.regenerateOtp = async (req, res) => {
 
     await sendEmail({
       email: shopkeeper.email,
-      subject: "Verification OTP",
+      subject: 'Verification OTP',
       message,
-    }); 
+    });
 
-sendTokenResponse(shopkeeper, 200, req, res);
-
+    sendTokenResponse(shopkeeper, 200, req, res);
   } catch (err) {
     console.log(err);
     res.status(500).send('server error');
@@ -170,7 +170,7 @@ sendTokenResponse(shopkeeper, 200, req, res);
 module.exports.getMe = async (req, res) => {
   try {
     console.log(req.user);
-    const user = await Shopkeeper.findById(req.user.id);
+    const user = await Shopkeeper.findById(req.user.id).populate('shops');
     if (!user) {
       return res.status(400).json({
         success: false,
