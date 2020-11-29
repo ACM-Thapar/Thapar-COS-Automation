@@ -78,7 +78,9 @@ module.exports.update_shop = async (req, res) => {
 module.exports.myshops = async (req, res) => {
   try {
     console.log(req.user._id);
-    const myshops = await Shop.find({ owner: req.user._id }).populate('shops');
+    const myshops = await Shop.find({ owner: req.user._id }).populate(
+      'inventory',
+    );
     if (!myshops) {
       return res.status(400).json({
         success: false,

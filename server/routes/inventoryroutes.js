@@ -9,7 +9,11 @@ const multer = require('multer');
 const customStorage = require('../config/multer-storage');
 
 // * Controllers
-const { addInventory } = require('../controllers/inventorycontrollers');
+const {
+  addInventory,
+  markInventoryAvailablity,
+  updateInventoryProduct,
+} = require('../controllers/inventorycontrollers');
 
 // * Middleware
 const { protectShopkeeper } = require('../middleware/auth');
@@ -42,5 +46,14 @@ function checkFileType(file, cb) {
 const router = express.Router();
 
 router.post('/add-inventory/:id', [protectShopkeeper, upload], addInventory);
-
+router.put(
+  '/update-availability/:id',
+  [protectShopkeeper],
+  markInventoryAvailablity,
+);
+router.put(
+  '/update-product/:id',
+  [protectShopkeeper, upload],
+  updateInventoryProduct,
+);
 module.exports = router;

@@ -4,6 +4,7 @@ const inventory = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Please add a name'],
+      trim: true,
     },
     photo: {
       type: String,
@@ -12,6 +13,7 @@ const inventory = new mongoose.Schema(
     price: {
       type: Number,
       required: [true, 'Please add a price for the item'],
+      trim: true,
     },
     outOfStock: {
       type: Boolean,
@@ -30,6 +32,8 @@ const inventory = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
+
+inventory.index({ shop: 1 });
 
 const Inventory = mongoose.model('Inventory', inventory);
 module.exports = Inventory;

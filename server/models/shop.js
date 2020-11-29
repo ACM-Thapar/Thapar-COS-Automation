@@ -42,12 +42,22 @@ const shopSchema = new mongoose.Schema(
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
+
+shopSchema.index({ owner: 1 });
+
 shopSchema.virtual('members', {
   ref: 'Review', // The model to use
   localField: 'shop_rating', // Find people where `localField`
   foreignField: 'rating', // is equal to `foreignField`
   // If `justOne` is true, 'members' will be a single doc as opposed to
   // an array. `justOne` is false by default.
+  justOne: false,
+});
+
+shopSchema.virtual('inventory', {
+  ref: 'Inventory',
+  localField: '_id',
+  foreignField: 'shop',
   justOne: false,
 });
 
