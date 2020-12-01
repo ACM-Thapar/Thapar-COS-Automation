@@ -1,8 +1,12 @@
 import 'package:clientapp/SettingsPage.dart';
+import 'package:clientapp/UserType.dart';
 
 import './Builder.dart';
 
 import 'package:flutter/material.dart';
+
+import 'OTP Verification/OTP-1.dart';
+import 'OTP Verification/OTP-2.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,7 +22,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SettingPage(),
+      home: OTP2(),
     );
   }
 }
