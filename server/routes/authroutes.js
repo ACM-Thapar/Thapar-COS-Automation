@@ -12,7 +12,11 @@ const { protectShopkeeper } = require('../middleware/auth');
 router.post('/signup', authController.post_signup);
 router.post('/login', authController.post_login);
 router.post('/verify-otp', [protectShopkeeper], authController.verifyOtp);
-router.put('/regenerate-otp', [protectShopkeeper], authController.regenerateOtp);
+router.put(
+  '/regenerate-otp',
+  [protectShopkeeper],
+  authController.regenerateOtp,
+);
 router.get('/me', [protectShopkeeper], authController.getMe);
 
 // auth with google
