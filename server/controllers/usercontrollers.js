@@ -1,11 +1,11 @@
 // *Utils
 const { check, validationResult } = require('express-validator');
-const sendEmail = require("../utils/sendEmail");
+const sendEmail = require('../utils/sendEmail');
 
 // *NPM Packages
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const otpGenerator = require("otp-generator");
+const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 
 // *Models
@@ -38,16 +38,23 @@ module.exports.post_signup = async (req, res) => {
       specialChars: false,
     });
     console.log(otp);
-    const newValue = { name, phone, email, password, hostel, otp: { code: otp } }
+    const newValue = {
+      name,
+      phone,
+      email,
+      password,
+      hostel,
+      otp: { code: otp },
+    };
 
     user = await User.create(newValue);
     const message = `Thanks for registering! We will need to verify your email first. You can do so by entering ${user.otp.code}. This code is valid for only next 15 minutes.`;
 
-await sendEmail({
-  email: user.email,
-  subject: "Verification OTP",
-  message,
-});
+    await sendEmail({
+      email: user.email,
+      subject: 'Verification OTP',
+      message,
+    });
 
     sendTokenResponse(user, 200, req, res);
   } catch (err) {
@@ -87,7 +94,6 @@ module.exports.post_login = async (req, res) => {
 // @route    POST /api/user/verify-otp
 // @access   Private
 module.exports.verifyOtp = async (req, res) => {
-
   try {
     const user = await User.findById(req.user.id);
 
@@ -115,7 +121,7 @@ module.exports.verifyOtp = async (req, res) => {
 
     user.verified = true;
     await user.save({ validateBeforeSave: false });
-    return res.status(200).json({ message: "Sucessfully Verified" });
+    return res.status(200).json({ message: 'Sucessfully Verified' });
   } catch (err) {
     console.log(err);
     res.status(500).send('server error');
@@ -134,7 +140,9 @@ module.exports.regenerateOtp = async (req, res) => {
 
     // if user is already verified
     if (user.verified === true) {
-      return res.status(400).json({ errors: [{ msg: 'User already verified' }] });
+      return res
+        .status(400)
+        .json({ errors: [{ msg: 'User already verified' }] });
     }
 
     user.otp.code = undefined;
@@ -153,12 +161,11 @@ module.exports.regenerateOtp = async (req, res) => {
 
     await sendEmail({
       email: user.email,
-      subject: "Verification OTP",
+      subject: 'Verification OTP',
       message,
-    }); 
+    });
 
-sendTokenResponse(user, 200, req, res);
-
+    sendTokenResponse(user, 200, req, res);
   } catch (err) {
     console.log(err);
     res.status(500).send('server error');

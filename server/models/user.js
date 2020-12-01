@@ -28,12 +28,12 @@ const userSchema = new mongoose.Schema({
     code: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
     validity: {
       type: Date,
       default: new Date(Date.now() + 15 * 60 * 1000),
-    }
+    },
   },
   verified: {
     type: Boolean,
@@ -58,7 +58,7 @@ userSchema.methods.matchOtp = function (enteredOtp) {
 };
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   // Check if the password is modified or not, if it is not then move along, don't perform the hashing stuff
   if (!this.isModified('password')) {
     next();
@@ -68,7 +68,7 @@ userSchema.pre('save', async function(next) {
 });
 
 // Sign JWT and return
-userSchema.methods.getSignedJwtToken = function() {
+userSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWTTOKEN);
 };
 

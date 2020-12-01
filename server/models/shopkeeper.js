@@ -62,7 +62,7 @@ shopkeeperSchema.virtual('shops', {
 });
 
 // Match otp entered by the shopkeeper with otp stored in the database
-shopkeeperSchema.methods.matchOtp = function(enteredOtp) {
+shopkeeperSchema.methods.matchOtp = function (enteredOtp) {
   if (enteredOtp !== this.otp.code) {
     return false;
   }
@@ -70,7 +70,7 @@ shopkeeperSchema.methods.matchOtp = function(enteredOtp) {
 };
 
 // Encrypt password using bcrypt
-shopkeeperSchema.pre('save', async function(next) {
+shopkeeperSchema.pre('save', async function (next) {
   // Check if the password is modified or not, if it is not then move along, don't perform the hashing stuff
   if (!this.isModified('password')) {
     next();
@@ -80,7 +80,7 @@ shopkeeperSchema.pre('save', async function(next) {
 });
 
 // Sign JWT and return
-shopkeeperSchema.methods.getSignedJwtToken = function() {
+shopkeeperSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWTTOKEN);
 };
 

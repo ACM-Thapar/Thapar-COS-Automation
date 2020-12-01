@@ -59,7 +59,7 @@ shopSchema.virtual('inventory', {
   justOne: false,
 });
 
-shopSchema.pre('remove', async function(next) {
+shopSchema.pre('remove', async function (next) {
   console.log('Inventory being cleared...');
   await this.model('Inventory').deleteMany({ shop: this._id });
   next();

@@ -24,7 +24,7 @@ const storage = customStorage({});
 
 const upload = multer({
   storage: storage,
-  fileFilter: function(req, file, cb) {
+  fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
   },
 }).single('photo');
