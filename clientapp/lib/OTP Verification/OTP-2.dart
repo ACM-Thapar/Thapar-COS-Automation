@@ -1,16 +1,12 @@
 import 'package:clientapp/PageResizing/Variables.dart';
-import 'package:clientapp/PageResizing/WidgetResizing.dart';
+import '../Intro/Intro1.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:otp_text_field/otp_field.dart';
 
 class OTP2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -42,7 +38,7 @@ class OTP2 extends StatelessWidget {
                   width: 74.3 * boxSizeH / 3.6,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage('images/Group 57.png'),
+                          image: AssetImage('assets/Group57.png'),
                           fit: BoxFit.fill)),
                 ),
                 SizedBox(
@@ -93,20 +89,30 @@ class OTP2 extends StatelessWidget {
                   textFieldAlignment: MainAxisAlignment.spaceAround,
                 )),
                 SizedBox(height: 34.5 * boxSizeV / 6.4),
-                Container(
-                  alignment: Alignment.center,
-                  width: 291 * boxSizeH / 3.6,
-                  height: 58 * boxSizeV / 6.4,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(14)),
-                    color: Colors.black,
-                  ),
-                  child: Text(
-                    'Verify and Proceed',
-                    style: GoogleFonts.josefinSans(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Intro1(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: 291 * boxSizeH / 3.6,
+                    height: 58 * boxSizeV / 6.4,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(14)),
+                      color: Colors.black,
+                    ),
+                    child: Text(
+                      'Verify and Proceed',
+                      style: GoogleFonts.josefinSans(
+                        fontSize: 24,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 )

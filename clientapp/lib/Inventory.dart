@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
 
 class Inventory extends StatefulWidget {
   @override
@@ -11,10 +10,6 @@ class Inventory extends StatefulWidget {
 class _InventoryState extends State<Inventory> {
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
