@@ -1,8 +1,9 @@
+import 'package:clientapp/HomePage.dart';
+import 'package:clientapp/Shop%20Profile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
 
 class ProfileBuilder extends StatefulWidget {
   ProfileBuilder({this.type});
@@ -17,10 +18,6 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
   bool eText = true, pText = true;
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -131,18 +128,45 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                     ),
                   ),
                 ),
-                widget.type
-                    ? Container(
-                        margin:
-                            EdgeInsets.only(top: 25, left: 95 / 3.6 * boxSizeH),
-                        child: Text(
-                          'Fill Shop Details',
-                          style: TextStyle(
-                            fontSize: 15,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            widget.type ? ShopProfile() : HomePage(),
+                      ),
+                    );
+                  },
+                  child: widget.type
+                      ? Container(
+                          margin: EdgeInsets.only(
+                              top: 25, left: 95 / 3.6 * boxSizeH),
+                          child: Text(
+                            'Fill Shop Details',
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          margin: EdgeInsets.only(
+                              top: 50, left: 95 / 3.6 * boxSizeH),
+                          child: Row(
+                            children: [
+                              Text(
+                                'View Shops',
+                                style: TextStyle(
+                                  fontSize: 25,
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                              )
+                            ],
                           ),
                         ),
-                      )
-                    : Container(),
+                )
               ],
             ),
           ),

@@ -1,10 +1,9 @@
-import 'package:clientapp/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:clientapp/PageResizing/Variables.dart';
-import './Intro1.dart';
+import '../UserType.dart';
+import '../PageResizing/Variables.dart';
 
 class Intro2 extends StatefulWidget {
   @override
@@ -70,7 +69,7 @@ class _Intro2State extends State<Intro2> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.contain,
-                      image: AssetImage('./images/Group 64.png'),
+                      image: AssetImage("assets/Group64.png"),
                     ),
                     // border: Border.all(),
                   ),
@@ -80,8 +79,8 @@ class _Intro2State extends State<Intro2> {
                 top: 58 * boxSizeV,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => LoginPage()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => UserType()));
                   },
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 40 * boxSizeH),

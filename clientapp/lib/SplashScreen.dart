@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import './PageResizing/Variables.dart';
 import './PageResizing/WidgetResizing.dart';
-import './Intro/Intro1.dart';
+import './LoginPage.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -19,10 +19,11 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   changeScreen() async {
-    Navigator.of(context).push(
+    Navigator.pushReplacement(
+      context,
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return Intro1();
+          return LoginPage();
         },
       ),
     );

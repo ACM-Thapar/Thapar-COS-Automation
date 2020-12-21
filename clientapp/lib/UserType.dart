@@ -2,7 +2,6 @@ import 'package:clientapp/Builder.dart';
 import 'package:flutter/material.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
 
 class UserType extends StatefulWidget {
   @override
@@ -15,10 +14,6 @@ class _UserTypeState extends State<UserType> {
   bool eText = true, pText = true;
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -93,7 +88,7 @@ class _UserTypeState extends State<UserType> {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     fit: BoxFit.fill,
-                    image: AssetImage('images/Mask Group 3.png'),
+                    image: AssetImage('assets/MaskGroup3.png'),
                   ),
                 ),
               ),

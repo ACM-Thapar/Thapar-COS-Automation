@@ -1,7 +1,8 @@
+import 'package:clientapp/LoginPage.dart';
+import 'package:clientapp/OTP%20Verification/OTP-1.dart';
 import 'package:flutter/material.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
 
 class Registeruser extends StatefulWidget {
   @override
@@ -14,10 +15,6 @@ class _RegisteruserState extends State<Registeruser> {
   bool eText = true, pText = true;
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         // resizeToAvoidBottomInset: false,
@@ -31,7 +28,7 @@ class _RegisteruserState extends State<Registeruser> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.fill,
-                      image: AssetImage('images/Mask Group 2.png'),
+                      image: AssetImage('assets/MaskGroup2.png'),
                     ),
                   ),
                 ),
@@ -115,22 +112,32 @@ class _RegisteruserState extends State<Registeruser> {
                           },
                         ),
                       ),
-                      Container(
-                        alignment: Alignment.center,
-                        height: 58 / 6.4 * boxSizeV,
-                        width: 291 / 3.6 * boxSizeH,
-                        margin: EdgeInsets.only(
-                          top: 33 / 6.4 * boxSizeV,
-                          left: 35 / 3.6 * boxSizeH,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Color(0xffCBCBCB)),
-                          color: Colors.black,
-                        ),
-                        child: Text(
-                          'Log In',
-                          style: TextStyle(color: Colors.white, fontSize: 21),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OTP1(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 58 / 6.4 * boxSizeV,
+                          width: 291 / 3.6 * boxSizeH,
+                          margin: EdgeInsets.only(
+                            top: 33 / 6.4 * boxSizeV,
+                            left: 35 / 3.6 * boxSizeH,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Color(0xffCBCBCB)),
+                            color: Colors.black,
+                          ),
+                          child: Text(
+                            'Register Now',
+                            style: TextStyle(color: Colors.white, fontSize: 21),
+                          ),
                         ),
                       ),
                       Container(
@@ -147,12 +154,22 @@ class _RegisteruserState extends State<Registeruser> {
                                   fontSize: 15,
                                 ),
                               ),
-                              Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  color: Color(0xffFFCB00),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LoginPage(),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    color: Color(0xffFFCB00),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               )
                             ],

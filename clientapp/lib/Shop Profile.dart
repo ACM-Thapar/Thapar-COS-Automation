@@ -1,7 +1,7 @@
+import 'package:clientapp/HomePage.dart';
 import 'package:flutter/material.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
 
 class ShopProfile extends StatefulWidget {
   @override
@@ -14,10 +14,6 @@ class _ShopProfileState extends State<ShopProfile> {
   bool eText = true, pText = true;
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -146,20 +142,30 @@ class _ShopProfileState extends State<ShopProfile> {
                     ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: 50, left: 95 / 3.6 * boxSizeH),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Inventory',
-                        style: TextStyle(
-                          fontSize: 25,
-                        ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(),
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                      )
-                    ],
+                    );
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(top: 50, left: 95 / 3.6 * boxSizeH),
+                    child: Row(
+                      children: [
+                        Text(
+                          'View Shops',
+                          style: TextStyle(
+                            fontSize: 25,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ],

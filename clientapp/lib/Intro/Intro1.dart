@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,6 +13,12 @@ class Intro1 extends StatefulWidget {
 }
 
 class _Intro1State extends State<Intro1> {
+  @override
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -70,7 +77,7 @@ class _Intro1State extends State<Intro1> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.contain,
-                      image: AssetImage('./images/Group 63.png'),
+                      image: AssetImage('assets/Group63.png'),
                     ),
                     // border: Border.all(),
                   ),
@@ -80,7 +87,7 @@ class _Intro1State extends State<Intro1> {
                 top: 33 * boxSizeV,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pushReplacement(
+                    Navigator.push(context,
                         MaterialPageRoute(builder: (context) => Intro2()));
                   },
                   child: Container(
@@ -138,7 +145,8 @@ class _Intro1State extends State<Intro1> {
                       ),
                       GestureDetector(
                           onTap: () {
-                            Navigator.of(context).pushReplacement(
+                            Navigator.push(
+                                context,
                                 MaterialPageRoute(
                                     builder: (context) => LoginPage()));
                           },

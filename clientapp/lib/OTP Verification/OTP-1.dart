@@ -1,5 +1,5 @@
+import 'package:clientapp/OTP%20Verification/OTP-2.dart';
 import 'package:clientapp/PageResizing/Variables.dart';
-import 'package:clientapp/PageResizing/WidgetResizing.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -7,9 +7,6 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 class OTP1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -41,7 +38,7 @@ class OTP1 extends StatelessWidget {
                   width: 74.3 * boxSizeH / 3.6,
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                          image: AssetImage('images/Group 42.png'),
+                          image: AssetImage('assets/Group42.png'),
                           fit: BoxFit.fill)),
                 ),
                 SizedBox(
@@ -113,20 +110,30 @@ class OTP1 extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 34.5 * boxSizeV / 6.4),
-                Container(
-                  alignment: Alignment.center,
-                  width: 291 * boxSizeH / 3.6,
-                  height: 58 * boxSizeV / 6.4,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(14)),
-                    color: Colors.black,
-                  ),
-                  child: Text(
-                    'Get OTP',
-                    style: GoogleFonts.josefinSans(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OTP2(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: 291 * boxSizeH / 3.6,
+                    height: 58 * boxSizeV / 6.4,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(14)),
+                      color: Colors.black,
+                    ),
+                    child: Text(
+                      'Get OTP',
+                      style: GoogleFonts.josefinSans(
+                        fontSize: 24,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 )
