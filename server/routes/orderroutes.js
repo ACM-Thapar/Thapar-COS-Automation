@@ -1,7 +1,13 @@
 const express = require('express');
 
 // * Controllers
-const { addOrder, viewOrder, viewAllOrders, updateOrder, deleteOrder } = require('../controllers/ordercontrollers');
+const {
+  addOrder,
+  viewOrder,
+  viewAllOrders,
+  updateOrder,
+  deleteOrder,
+} = require('../controllers/ordercontrollers');
 
 // * Middleware
 const { protectUser } = require('../middleware/auth');
