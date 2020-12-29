@@ -1,8 +1,6 @@
 // * Utils
 const { check, validationResult } = require('express-validator');
 
-// Adding comment
-
 // * Models
 const Order = require('../models/order');
 const Shop = require('../models/shop');
@@ -96,10 +94,10 @@ module.exports.viewAllOrders = async (req, res) => {
   }
 };
 
-// @desc     Update an order
-// @route    PUT /api/order/update-order/:id
+// @desc     Update an order (user)
+// @route    PUT /api/order/update-order-user/:id
 // @access   Private
-module.exports.updateOrder = async (req, res) => {
+module.exports.updateOrderUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -113,6 +111,13 @@ module.exports.updateOrder = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Order doesn't exist" });
     }
+    // Check if the person updating the order is the one who placed it
+    if (!order.placedBy.equals(req.user._id) || req.body.status) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not Authorised to perform this action',
+      });
+    }
     order = await Order.findByIdAndUpdate(req.params.id, body, {
       runValidators: false,
       new: true,
@@ -124,21 +129,97 @@ module.exports.updateOrder = async (req, res) => {
   }
 };
 
-// @desc     Delete order
-// @route    DELETE /api/order/delete-order/:id
+// @desc     Update an order (shopkeeper)
+// @route    PUT /api/order/update-order-shopkeeper/:id
 // @access   Private
-module.exports.deleteOrder = async (req, res) => {
+module.exports.updateOrderShopkeeper = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  try {
+    let body = { ...req.body };
+    let order = await Order.findById(req.params.id);
+    let shop = await Shop.findById(order.shop);
+    // Check if the order exists
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order doesn't exist" });
+    }
+    // Check if the person updating the order is the owner of that shop
+    if (!shop.owner.equals(req.user._id)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not Authorised to perform this action',
+      });
+    }
+    order = await Order.findByIdAndUpdate(req.params.id, body, {
+      runValidators: false,
+      new: true,
+    });
+    res.status(200).json({ success: true, data: order });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Server error');
+  }
+};
+
+// @desc     Delete order (user)
+// @route    DELETE /api/order/delete-order-user/:id
+// @access   Private
+module.exports.deleteOrderUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
     let order = await Order.findById(req.params.id);
+    let shop = await Shop.findById(order.shop);
     // Check if the order exists
     if (!order) {
       return res
         .status(404)
         .json({ success: false, message: "Order doesn't exist" });
+    }
+    // Check if the person deleting the order is the one who placed it
+    if (!order.placedBy.equals(req.user._id)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not Authorised to perform this action',
+      });
+    }
+    order = await Order.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: 'Deleted sucessfully' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('Server error');
+  }
+};
+
+// @desc     Delete order (shopkeeper)
+// @route    DELETE /api/order/delete-order-shopkeeper/:id
+// @access   Private
+module.exports.deleteOrderShopkeeper = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  try {
+    let order = await Order.findById(req.params.id);
+    let shop = await Shop.findById(order.shop);
+    // Check if the order exists
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order doesn't exist" });
+    }
+    // Check if the person deleting the order is the owner of that shop
+    if (!shop.owner.equals(req.user._id)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Not Authorised to perform this action',
+      });
     }
     order = await Order.findByIdAndDelete(req.params.id);
     res.status(200).json({ success: true, message: 'Deleted sucessfully' });

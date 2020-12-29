@@ -5,12 +5,14 @@ const {
   addOrder,
   viewOrder,
   viewAllOrders,
-  updateOrder,
-  deleteOrder,
+  updateOrderUser,
+  updateOrderShopkeeper,
+  deleteOrderUser,
+  deleteOrderShopkeeper,
 } = require('../controllers/ordercontrollers');
 
 // * Middleware
-const { protectUser } = require('../middleware/auth');
+const { protectUser, protectShopkeeper } = require('../middleware/auth');
 
 // * API Endpoints -->
 const router = express.Router();
@@ -18,7 +20,17 @@ const router = express.Router();
 router.post('/add-order/:id', [protectUser], addOrder);
 router.get('/view-order/:id', [protectUser], viewOrder);
 router.get('/view-all-orders', [protectUser], viewAllOrders);
-router.put('/update-order/:id', [protectUser], updateOrder);
-router.delete('/delete-order/:id', [protectUser], deleteOrder);
+router.put('/update-order-user/:id', [protectUser], updateOrderUser);
+router.put(
+  '/update-order-shopkeeper/:id',
+  [protectShopkeeper],
+  updateOrderShopkeeper,
+);
+router.delete('/delete-order-user/:id', [protectUser], deleteOrderUser);
+router.delete(
+  '/delete-order-shopkeeper/:id',
+  [protectShopkeeper],
+  deleteOrderShopkeeper,
+);
 
 module.exports = router;
