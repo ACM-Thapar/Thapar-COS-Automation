@@ -15,13 +15,28 @@ module.exports.addOrder = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  // Printing item name & price
   try {
-    let inventory;
-    req.body.items.forEach(async (item) => {
-      inventory = await Inventory.findById(item);
+    const shop = await Shop.findById(req.params.id).lean();
+    if (!shop) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Shop doesn't exist" });
+    }
+    // Printing item name & price
+    for (const item of req.body.items) {
+      let inventory = await Inventory.findById(item);
+      if (!inventory) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'Product id invalid' });
+      } else if (!inventory.shop.equals(shop._id)) {
+        // Check if the inventory item belongs to the store
+        return res
+          .status(400)
+          .json({ success: false, message: 'Invalid Request' });
+      }
       console.log(inventory.name, inventory.price);
-    });
+    }
 
     let value = { ...req.body, placedBy: req.user._id, shop: req.params.id };
 
@@ -48,10 +63,15 @@ module.exports.viewOrder = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    let order = await Order.findById(req.params.id).populate({
-      path: 'shop',
-      select: 'name',
-    });
+    let order = await Order.findById(req.params.id)
+      .populate({
+        path: 'shop',
+        select: 'name',
+      })
+      .populate({
+        path: 'items',
+        select: 'name photo price',
+      });
     if (!order) {
       return res
         .status(400)
@@ -79,7 +99,10 @@ module.exports.viewAllOrders = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const orders = await Order.find({ placedBy: req.user._id });
+    const orders = await Order.find({ placedBy: req.user._id }).populate({
+      path: 'shop',
+      select: 'name',
+    });
     return res.status(200).json({
       success: true,
       count: orders.length,
@@ -104,7 +127,7 @@ module.exports.updateOrderUser = async (req, res) => {
   }
   try {
     let body = { ...req.body };
-    let order = await Order.findById(req.params.id);
+    let order = await Order.findById(req.params.id).lean();
     // Check if the order exists
     if (!order) {
       return res
@@ -139,14 +162,14 @@ module.exports.updateOrderShopkeeper = async (req, res) => {
   }
   try {
     let body = { ...req.body };
-    let order = await Order.findById(req.params.id);
-    let shop = await Shop.findById(order.shop);
+    let order = await Order.findById(req.params.id).lean();
     // Check if the order exists
     if (!order) {
       return res
         .status(404)
         .json({ success: false, message: "Order doesn't exist" });
     }
+    let shop = await Shop.findById(order.shop).lean();
     // Check if the person updating the order is the owner of that shop
     if (!shop.owner.equals(req.user._id)) {
       return res.status(401).json({
@@ -174,8 +197,8 @@ module.exports.deleteOrderUser = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    let order = await Order.findById(req.params.id);
-    let shop = await Shop.findById(order.shop);
+    let order = await Order.findById(req.params.id).lean();
+
     // Check if the order exists
     if (!order) {
       return res
@@ -206,14 +229,14 @@ module.exports.deleteOrderShopkeeper = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    let order = await Order.findById(req.params.id);
-    let shop = await Shop.findById(order.shop);
+    let order = await Order.findById(req.params.id).lean();
     // Check if the order exists
     if (!order) {
       return res
         .status(404)
         .json({ success: false, message: "Order doesn't exist" });
     }
+    let shop = await Shop.findById(order.shop).lean();
     // Check if the person deleting the order is the owner of that shop
     if (!shop.owner.equals(req.user._id)) {
       return res.status(401).json({
