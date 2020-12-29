@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const inventory = new mongoose.Schema(
   {
     name: {

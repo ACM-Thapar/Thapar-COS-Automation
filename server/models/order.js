@@ -50,5 +50,7 @@ const orderSchema = new mongoose.Schema(
   },
 );
 
+orderSchema.index({ placedBy: 1, shop: 1 });
+
 const Order = mongoose.model('Order', orderSchema);
 module.exports = Order;

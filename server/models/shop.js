@@ -39,6 +39,10 @@ const shopSchema = new mongoose.Schema(
     shop_rating: {
       type: Number,
     },
+    photo: {
+      type: String,
+      default: null,
+    },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
