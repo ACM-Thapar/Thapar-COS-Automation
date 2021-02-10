@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'PageResizing/Variables.dart';
 import './PageResizing/WidgetResizing.dart';
+import './Tracking.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -471,25 +472,36 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(
-                      top: 559 / 6.4 * boxSizeV, left: 148 / 3.6 * boxSizeH),
-                  height: 64 / 6.4 * boxSizeV,
-                  width: 64 / 3.6 * boxSizeH,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 7,
+                GestureDetector(
+                  onTap: () {
+                    print('tap');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TrackingPage(),
                       ),
-                    ],
-                    shape: BoxShape.circle,
-                    color: Colors.black,
-                  ),
-                  child: Icon(
-                    Icons.swap_vert,
-                    color: Colors.white,
+                    );
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(
+                        top: 559 / 6.4 * boxSizeV, left: 148 / 3.6 * boxSizeH),
+                    height: 64 / 6.4 * boxSizeV,
+                    width: 64 / 3.6 * boxSizeH,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 7,
+                        ),
+                      ],
+                      shape: BoxShape.circle,
+                      color: Colors.black,
+                    ),
+                    child: Icon(
+                      Icons.swap_vert,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],

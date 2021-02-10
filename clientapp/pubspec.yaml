@@ -29,6 +29,7 @@ dependencies:
   intl_phone_number_input: ^0.5.1
   material_design_icons_flutter: ^4.0.5755
   otp_text_field: ^1.0.1
+  timelines: ^0.0.2+1
 
 dev_dependencies:
   flutter_test:
