@@ -1,9 +1,9 @@
-import 'package:clientapp/HomePage.dart';
-import 'package:clientapp/Shop%20Profile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import 'PageResizing/Variables.dart';
+import '../PageResizing/Variables.dart';
+import './HomePage.dart';
+import './ShopProfile.dart';
 
 class ProfileBuilder extends StatefulWidget {
   ProfileBuilder({this.type});

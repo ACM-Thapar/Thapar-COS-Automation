@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../PageResizing/Variables.dart';
 import '../UserType.dart';
-import '../PageResizing/Variables.dart';
 
 class Intro2 extends StatefulWidget {
   @override

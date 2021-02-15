@@ -1,7 +1,11 @@
-import 'package:clientapp/Builder.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
-import 'PageResizing/Variables.dart';
+import '../Services/User.dart';
+import '../Screens/LoginPage.dart';
+import '../PageResizing/Variables.dart';
+import '../PageResizing/WidgetResizing.dart';
 
 class UserType extends StatefulWidget {
   @override
@@ -9,11 +13,17 @@ class UserType extends StatefulWidget {
 }
 
 class _UserTypeState extends State<UserType> {
-  String email;
-  String password;
-  bool eText = true, pText = true;
+  @override
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+    boxSizeH = SizeConfig.safeBlockHorizontal;
+    boxSizeV = SizeConfig.safeBlockVertical;
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -101,12 +111,12 @@ class _UserTypeState extends State<UserType> {
                   children: [
                     GestureDetector(
                       onTap: () {
+                        Provider.of<AppUser>(context, listen: false)
+                            .setProfile(user: true);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProfileBuilder(
-                              type: false,
-                            ),
+                            builder: (context) => LoginPage(),
                           ),
                         );
                       },
@@ -123,12 +133,12 @@ class _UserTypeState extends State<UserType> {
                     ),
                     GestureDetector(
                       onTap: () {
+                        Provider.of<AppUser>(context, listen: false)
+                            .setProfile(user: false);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ProfileBuilder(
-                              type: true,
-                            ),
+                            builder: (context) => LoginPage(),
                           ),
                         );
                       },

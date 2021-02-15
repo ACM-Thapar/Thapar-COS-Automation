@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'PageResizing/Variables.dart';
+import '../PageResizing/Variables.dart';
 
 class Inventory extends StatefulWidget {
   @override

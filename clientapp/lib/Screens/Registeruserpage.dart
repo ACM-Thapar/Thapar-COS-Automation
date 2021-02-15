@@ -1,8 +1,12 @@
-import 'package:clientapp/LoginPage.dart';
-import 'package:clientapp/OTP%20Verification/OTP-1.dart';
+import 'package:clientapp/Services/User.dart';
+import 'package:clientapp/Services/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'PageResizing/Variables.dart';
+import '../PageResizing/Variables.dart';
+import './OTP_Verification/OTP-1.dart';
+import './LoginPage.dart';
 
 class Registeruser extends StatefulWidget {
   @override
@@ -222,23 +226,51 @@ class _RegisteruserState extends State<Registeruser> {
                                     color: Colors.white, fontSize: 15),
                               ),
                             ),
-                            Container(
-                              alignment: Alignment.center,
-                              height: 38 / 6.4 * boxSizeV,
-                              width: 132 / 3.6 * boxSizeH,
-                              margin: EdgeInsets.only(
-                                top: 20 / 6.4 * boxSizeV,
-                                left: 35 / 3.6 * boxSizeH,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Color(0xffCBCBCB)),
-                                color: Colors.white,
-                              ),
-                              child: Text(
-                                'Google',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
+                            GestureDetector(
+                              onTap: () async {
+                                UserCredential userCredentials = await Provider
+                                        .of<Auth>(context, listen: false)
+                                    .googleAuth(); //GOOGLE SIGN IN TO GET FirebaseUserCredentials
+                                User firebaseUser = userCredentials
+                                    .user; //Getting FirebaseUser from Credentials
+                                Provider.of<AppUser>(context, listen: false)
+                                    .setFirebaseuser(
+                                        firebaseUser:
+                                            firebaseUser); //Setting FirebaseUser for whole APP
+                                Provider.of<AppUser>(context, listen: false)
+                                    .setProfile(
+                                  name: firebaseUser.displayName,
+                                  email: firebaseUser.email,
+                                  password: firebaseUser.uid,
+                                  phone: firebaseUser.phoneNumber,
+                                ); //Setting profile for user
+                                Provider.of<AppUser>(context, listen: false)
+                                    .printUser(Provider.of<AppUser>(context,
+                                        listen: false));
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (context) => OTP1(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                height: 38 / 6.4 * boxSizeV,
+                                width: 132 / 3.6 * boxSizeH,
+                                margin: EdgeInsets.only(
+                                  top: 20 / 6.4 * boxSizeV,
+                                  left: 35 / 3.6 * boxSizeH,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Color(0xffCBCBCB)),
+                                  color: Colors.white,
+                                ),
+                                child: Text(
+                                  'Google',
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 15),
+                                ),
                               ),
                             ),
                           ],

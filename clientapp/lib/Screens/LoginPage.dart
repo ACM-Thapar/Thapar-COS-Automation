@@ -1,10 +1,13 @@
-import 'package:clientapp/HomePage.dart';
-import 'package:clientapp/Registeruserpage.dart';
+import 'package:clientapp/Services/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-import 'PageResizing/Variables.dart';
-import './PageResizing/WidgetResizing.dart';
+import '../Services/User.dart';
+import '../PageResizing/Variables.dart';
+import './Registeruserpage.dart';
+import './HomePage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,20 +15,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String email;
-  String password;
-  bool eText = true, pText = true;
-  @override
-  void initState() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
+    print(Provider.of<AppUser>(context, listen: false).user);
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -246,23 +238,47 @@ class _LoginPageState extends State<LoginPage> {
                                       color: Colors.white, fontSize: 15),
                                 ),
                               ),
-                              Container(
-                                alignment: Alignment.center,
-                                height: 38 / 6.4 * boxSizeV,
-                                width: 132 / 3.6 * boxSizeH,
-                                margin: EdgeInsets.only(
-                                  top: 20 / 6.4 * boxSizeV,
-                                  left: 35 / 3.6 * boxSizeH,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Color(0xffCBCBCB)),
-                                  color: Colors.white,
-                                ),
-                                child: Text(
-                                  'Google',
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 15),
+                              GestureDetector(
+                                onTap: () async {
+                                  UserCredential userCredentials =
+                                      await Provider.of<Auth>(context,
+                                              listen: false)
+                                          .googleAuth();
+                                  Provider.of<AppUser>(context, listen: false)
+                                      .setProfile(
+                                    name: userCredentials.user.displayName,
+                                    email: userCredentials.user.email,
+                                    password: userCredentials.user.uid,
+                                    phone: userCredentials.user.phoneNumber,
+                                  );
+                                  Provider.of<AppUser>(context, listen: false)
+                                      .printUser(Provider.of<AppUser>(context,
+                                          listen: false));
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => HomePage(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: 38 / 6.4 * boxSizeV,
+                                  width: 132 / 3.6 * boxSizeH,
+                                  margin: EdgeInsets.only(
+                                    top: 20 / 6.4 * boxSizeV,
+                                    left: 35 / 3.6 * boxSizeH,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    border:
+                                        Border.all(color: Color(0xffCBCBCB)),
+                                    color: Colors.white,
+                                  ),
+                                  child: Text(
+                                    'Google',
+                                    style: TextStyle(
+                                        color: Colors.black, fontSize: 15),
+                                  ),
                                 ),
                               ),
                             ],

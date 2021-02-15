@@ -1,10 +1,10 @@
-import 'package:clientapp/Inventory.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 
-import 'PageResizing/Variables.dart';
-import './PageResizing/WidgetResizing.dart';
+import '../PageResizing/Variables.dart';
+import '../PageResizing/WidgetResizing.dart';
+import './Inventory.dart';
 import './Tracking.dart';
 
 class HomePage extends StatefulWidget {

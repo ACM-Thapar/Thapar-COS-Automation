@@ -3,6 +3,9 @@ import '../Intro/Intro1.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:otp_text_field/otp_field.dart';
+import 'package:provider/provider.dart';
+import '../../Services/User.dart';
+import './OTP-1.dart';
 
 class OTP2 extends StatelessWidget {
   @override
@@ -23,6 +26,11 @@ class OTP2 extends StatelessWidget {
                   child: GestureDetector(
                       onTap: () {
                         print("BACK");
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => OTP1(),
+                          ),
+                        );
                       },
                       child: Icon(
                         Icons.arrow_back,
@@ -66,7 +74,7 @@ class OTP2 extends StatelessWidget {
                           fontSize: 22, color: Colors.black54),
                       children: [
                         TextSpan(
-                            text: '+91- Phone Number',
+                            text: '+91- ${Provider.of<AppUser>(context).phone}',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black)),

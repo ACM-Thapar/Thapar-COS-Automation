@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "216667051188",
+    "project_id": "cosmos-294417",
+    "storage_bucket": "cosmos-294417.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216667051188:android:4504f161a3889ec7df33e1",
+        "android_client_info": {
+          "package_name": "com.example.clientapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "216667051188-i084lu5jf0moic2e1bl9si18f3eto8va.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.clientapp",
+            "certificate_hash": "547dc4c441dc1b3061a1a3f1bd400a83aeebd56a"
+          }
+        },
+        {
+          "client_id": "216667051188-u8pg2dltk3n4cgbbhn90lgmrde15bs4h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA54yIMj_yl35DKsC-412WjvGAoT2taQ_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "216667051188-o27h3cms8gni4oovo7g8opv97fdnkdma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

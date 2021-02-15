@@ -1,12 +1,14 @@
 import 'dart:async';
 
+import 'package:clientapp/Screens/HomePage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import './PageResizing/Variables.dart';
-import './PageResizing/WidgetResizing.dart';
-import './LoginPage.dart';
+import '../Screens/UserType.dart';
+import '../PageResizing/Variables.dart';
+import '../PageResizing/WidgetResizing.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -14,16 +16,19 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  startTimeout() {
+  Timer startTimeout() {
     return Timer(Duration(seconds: 3), changeScreen);
   }
 
-  changeScreen() async {
+  void changeScreen() async {
+    FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (BuildContext context) {
-          return LoginPage();
+          return FirebaseAuth.instance.currentUser != null
+              ? HomePage()
+              : UserType();
         },
       ),
     );
