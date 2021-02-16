@@ -11,6 +11,7 @@ const OAuth2 = google.auth.OAuth2;
 
 // * Models
 const Shopkeeper = require('../models/shopkeeper');
+const User = require('../models/user');
 
 // @desc     Register Shopkeeper
 // @route    POST /api/auth/signup
@@ -21,23 +22,32 @@ module.exports.post_signup = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, phone, email, password, shop } = req.body;
+  const { email } = req.body;
 
   try {
-    let shopkeeper = await Shopkeeper.findOne({ email: email }).lean();
+    let [user, shopkeeper] = await Promise.all([
+      User.findOne({ email: email }).lean().exec(),
+      Shopkeeper.findOne({ email: email }).lean().exec(),
+    ]);
     if (shopkeeper) {
       return res.status(400).json('user already exists');
     }
-
+    if (user) {
+      return res.status(400).json('user with the same email already exists');
+    }
     //Generating an otp
     const otp = otpGenerator.generate(6, {
       upperCase: false,
       specialChars: false,
     });
     console.log(otp);
-    const newValue = { name, phone, email, password, shop, otp: { code: otp } };
-
-    shopkeeper = await Shopkeeper.create(newValue);
+    const newBody = {
+      ...req.body,
+      otp: {
+        code: otp,
+      },
+    };
+    shopkeeper = await Shopkeeper.create(newBody);
     const message = `Thanks for registering! We will need to verify your email first. You can do so by entering ${shopkeeper.otp.code}. This code is valid for only next 15 minutes.`;
 
     await sendEmail({
@@ -45,6 +55,45 @@ module.exports.post_signup = async (req, res) => {
       subject: 'Verification OTP',
       message,
     });
+
+    sendTokenResponse(shopkeeper, 200, req, res);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send('server error');
+  }
+};
+
+// @desc     Register Firebase Shopkeeper
+// @route    POST /api/auth/firebase-signup
+// @access   Public
+module.exports.firebaseRegisterShopkeeper = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email } = req.body;
+
+  try {
+    let [user, shopkeeper] = await Promise.all([
+      User.findOne({ email: email }).lean().exec(),
+      Shopkeeper.findOne({ email: email }).lean().exec(),
+    ]);
+    if (shopkeeper) {
+      return res.status(400).json('user already exists');
+    }
+    if (user) {
+      return res.status(400).json('user with the same email already exists');
+    }
+
+    const newBody = {
+      ...req.body,
+      isGoogleUser: true,
+      isPhoneVerified: true,
+      verified: true,
+    };
+
+    shopkeeper = await Shopkeeper.create(newBody);
 
     sendTokenResponse(shopkeeper, 200, req, res);
   } catch (err) {
@@ -188,10 +237,50 @@ module.exports.getMe = async (req, res) => {
   }
 };
 
+// @desc     Edit/Complete Profile
+// @route    PUT /api/auth/complete-profile
+// @access   Private
+
+module.exports.completeProfile = async (req, res) => {
+  try {
+    if (req.body.email) {
+      return res.status(400).json({
+        success: false,
+        data: 'Email cannot be updated',
+      });
+    }
+    const updateData = { ...req.body };
+    const user = await Shopkeeper.findByIdAndUpdate(req.user.id, updateData, {
+      new: true,
+      runValidators: true,
+    }).exec();
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        data: 'No user found',
+      });
+    }
+    const status = user.isCompleted;
+
+    res.status(200).json({
+      success: true,
+      data: user,
+      profileCompletion: status,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false, data: err });
+  }
+};
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, req, res) => {
   // Create token
   const token = user.getSignedJwtToken();
   req.session.token = token;
-  res.status(statusCode).json({ success: true, token });
+  const status = user.isCompleted;
+  res
+    .status(statusCode)
+    .json({ success: true, token, profileCompletion: status });
 };

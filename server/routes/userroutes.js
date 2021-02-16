@@ -1,19 +1,22 @@
+// * NPM Packages
 const express = require('express');
-const router = express.Router();
-const { check, validationResult } = require('express-validator');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const User = require('../models/user');
-const userController = require('../controllers/usercontrollers');
-const { userInfo } = require('os');
 const passport = require('passport');
+
+const router = express.Router();
+
+// * Controllers
+const userController = require('../controllers/usercontrollers');
+
+// * Middlewares
 const { protectUser } = require('../middleware/auth');
 
-router.post('/signup',[check('email','Must be a valid email ').isEmail(),check('phone','Must be a valid phone number').isLength({min:10,max:10})],userController.post_signup);
-router.post('/login',[check('email','Must be a valid email ').isEmail(),check('phone','Must be a valid phone number').isLength({min:10,max:10})], userController.post_login);
+router.post('/signup', userController.post_signup);
+router.post('/firebase-signup', userController.firebaseRegister);
+router.post('/login', userController.post_login);
 router.post('/verify-otp', [protectUser], userController.verifyOtp);
 router.put('/regenerate-otp', [protectUser], userController.regenerateOtp);
-router.get('/me', [check('email','Must be a valid email ').isEmail(),check('phone','Must be a valid phone number').isLength({min:10,max:10})],[protectUser], userController.getMe);
+router.get('/me', [protectUser], userController.getMe);
+router.put('/complete-profile', [protectUser], userController.completeProfile);
 
 // auth with google
 router.get(

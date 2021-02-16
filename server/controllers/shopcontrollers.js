@@ -22,15 +22,27 @@ module.exports.create_shop = async (req, res) => {
     if (shops) {
       return res.status(400).json('Profile for this shop already exists');
     }
-
-    shops = new Shop({
-      owner: req.user._id,
-      name,
-      phone,
-      timings,
-      capacity,
-      address,
-    });
+    if (req.file) {
+      // check if image is uploaded
+      shops = new Shop({
+        owner: req.user._id,
+        name,
+        phone,
+        timings,
+        capacity,
+        address,
+        photo: req.file.url,
+      });
+    } else if (!req.file) {
+      shops = new Shop({
+        owner: req.user._id,
+        name,
+        phone,
+        timings,
+        capacity,
+        address,
+      });
+    }
     console.log(shops);
     await shops.save();
     res.status(200).json({ success: true, shops });
@@ -46,8 +58,7 @@ module.exports.update_shop = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const { name, phone, status, timings, capacity, address } = req.body;
-  const fields = req.body;
+
   try {
     let update_shop = await Shop.findById(req.params.id).lean();
     //If shop does not exist in database
@@ -59,6 +70,9 @@ module.exports.update_shop = async (req, res) => {
       return res.status(400).json('Only owner can update shop profile');
     }
 
+    if (req.file) {
+      req.body.photo = req.file.url;
+    }
     let shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runVaildators: true,

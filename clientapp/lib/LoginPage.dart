@@ -1,7 +1,10 @@
+import 'package:clientapp/HomePage.dart';
+import 'package:clientapp/Registeruserpage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
+import './PageResizing/WidgetResizing.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,11 +16,16 @@ class _LoginPageState extends State<LoginPage> {
   String password;
   bool eText = true, pText = true;
   @override
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     boxSizeH = SizeConfig.safeBlockHorizontal;
     boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -30,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.fill,
-                      image: AssetImage('images/Mask Group 2.png'),
+                      image: AssetImage("assets/MaskGroup2.png"),
                     ),
                   ),
                 ),
@@ -127,22 +135,33 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        Container(
-                          alignment: Alignment.center,
-                          height: 58 / 6.4 * boxSizeV,
-                          width: 291 / 3.6 * boxSizeH,
-                          margin: EdgeInsets.only(
-                            top: 20 / 6.4 * boxSizeV,
-                            left: 35 / 3.6 * boxSizeH,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Color(0xffCBCBCB)),
-                            color: Colors.black,
-                          ),
-                          child: Text(
-                            'Log In',
-                            style: TextStyle(color: Colors.white, fontSize: 21),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 58 / 6.4 * boxSizeV,
+                            width: 291 / 3.6 * boxSizeH,
+                            margin: EdgeInsets.only(
+                              top: 20 / 6.4 * boxSizeV,
+                              left: 35 / 3.6 * boxSizeH,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Color(0xffCBCBCB)),
+                              color: Colors.black,
+                            ),
+                            child: Text(
+                              'Log In',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 21),
+                            ),
                           ),
                         ),
                         Container(
@@ -159,12 +178,22 @@ class _LoginPageState extends State<LoginPage> {
                                     fontSize: 15,
                                   ),
                                 ),
-                                Text(
-                                  'Join now',
-                                  style: TextStyle(
-                                    color: Color(0xffFFCB00),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Registeruser(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Join now',
+                                    style: TextStyle(
+                                      color: Color(0xffFFCB00),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 )
                               ],

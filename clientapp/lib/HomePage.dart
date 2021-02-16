@@ -1,8 +1,11 @@
+import 'package:clientapp/Inventory.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/services.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
+import './PageResizing/WidgetResizing.dart';
+import './Tracking.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,12 +16,16 @@ class _HomePageState extends State<HomePage> {
   String email;
   String password;
   bool eText = true, pText = true;
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     boxSizeH = SizeConfig.safeBlockHorizontal;
     boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -233,195 +240,228 @@ class _HomePageState extends State<HomePage> {
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color(0xffF8F8F8),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Color(0xffCBCBCB)),
-                                ),
-                                margin: EdgeInsets.only(
-                                  bottom: 8 / 6.4 * boxSizeV,
-                                ),
-                                height: 160 / 6.4 * boxSizeV,
-                                width: 291 / 3.6 * boxSizeH,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Inventory(),
+                                    ),
+                                  );
+                                },
                                 child: Container(
-                                  margin: EdgeInsets.only(
-                                    left: 14 / 6.4 * boxSizeV,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffF8F8F8),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border:
+                                        Border.all(color: Color(0xffCBCBCB)),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        margin: EdgeInsets.only(
-                                          top: 14 / 6.4 * boxSizeV,
-                                        ),
-                                        height: 85 / 6.4 * boxSizeV,
-                                        width: 260 / 3.6 * boxSizeH,
-                                        child: Container(
+                                  margin: EdgeInsets.only(
+                                    bottom: 8 / 6.4 * boxSizeV,
+                                  ),
+                                  height: 160 / 6.4 * boxSizeV,
+                                  width: 291 / 3.6 * boxSizeH,
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                      left: 14 / 6.4 * boxSizeV,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
                                           margin: EdgeInsets.only(
-                                            top: 6 / 6.4 * boxSizeV,
-                                            right: 10 / 3.6 * boxSizeH,
+                                            top: 14 / 6.4 * boxSizeV,
                                           ),
-                                          alignment: Alignment.topRight,
-                                          child: Icon(
-                                            FontAwesomeIcons.solidHeart,
-                                            color: Color(0xffFFCB00),
+                                          height: 85 / 6.4 * boxSizeV,
+                                          width: 260 / 3.6 * boxSizeH,
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                              top: 6 / 6.4 * boxSizeV,
+                                              right: 10 / 3.6 * boxSizeH,
+                                            ),
+                                            alignment: Alignment.topRight,
+                                            child: Icon(
+                                              FontAwesomeIcons.solidHeart,
+                                              color: Color(0xffFFCB00),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Text(
-                                        'Juju\'s Shop',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22),
-                                      ),
-                                      SizedBox(
-                                        height: 2,
-                                      ),
-                                      Text(
-                                        'Shop No. xyz',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                      ),
-                                    ],
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Text(
+                                          'Juju\'s Shop',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 22),
+                                        ),
+                                        SizedBox(
+                                          height: 2,
+                                        ),
+                                        Text(
+                                          'Shop No. xyz',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color(0xffF8F8F8),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Color(0xffCBCBCB)),
-                                ),
-                                margin: EdgeInsets.only(
-                                  bottom: 8 / 6.4 * boxSizeV,
-                                ),
-                                height: 160 / 6.4 * boxSizeV,
-                                width: 291 / 3.6 * boxSizeH,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Inventory(),
+                                    ),
+                                  );
+                                },
                                 child: Container(
-                                  margin: EdgeInsets.only(
-                                    left: 14 / 6.4 * boxSizeV,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffF8F8F8),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border:
+                                        Border.all(color: Color(0xffCBCBCB)),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        margin: EdgeInsets.only(
-                                          top: 14 / 6.4 * boxSizeV,
-                                        ),
-                                        height: 85 / 6.4 * boxSizeV,
-                                        width: 260 / 3.6 * boxSizeH,
-                                        child: Container(
+                                  margin: EdgeInsets.only(
+                                    bottom: 8 / 6.4 * boxSizeV,
+                                  ),
+                                  height: 160 / 6.4 * boxSizeV,
+                                  width: 291 / 3.6 * boxSizeH,
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                      left: 14 / 6.4 * boxSizeV,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
                                           margin: EdgeInsets.only(
-                                            top: 6 / 6.4 * boxSizeV,
-                                            right: 10 / 3.6 * boxSizeH,
+                                            top: 14 / 6.4 * boxSizeV,
                                           ),
-                                          alignment: Alignment.topRight,
-                                          child: Icon(
-                                            FontAwesomeIcons.solidHeart,
-                                            color: Color(0xffFFCB00),
+                                          height: 85 / 6.4 * boxSizeV,
+                                          width: 260 / 3.6 * boxSizeH,
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                              top: 6 / 6.4 * boxSizeV,
+                                              right: 10 / 3.6 * boxSizeH,
+                                            ),
+                                            alignment: Alignment.topRight,
+                                            child: Icon(
+                                              FontAwesomeIcons.solidHeart,
+                                              color: Color(0xffFFCB00),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Text(
-                                        'Juju\'s Shop',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22),
-                                      ),
-                                      SizedBox(
-                                        height: 2,
-                                      ),
-                                      Text(
-                                        'Shop No. xyz',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                      ),
-                                    ],
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Text(
+                                          'Juju\'s Shop',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 22),
+                                        ),
+                                        SizedBox(
+                                          height: 2,
+                                        ),
+                                        Text(
+                                          'Shop No. xyz',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color(0xffF8F8F8),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Color(0xffCBCBCB)),
-                                ),
-                                margin: EdgeInsets.only(
-                                  bottom: 8 / 6.4 * boxSizeV,
-                                ),
-                                height: 160 / 6.4 * boxSizeV,
-                                width: 291 / 3.6 * boxSizeH,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Inventory(),
+                                    ),
+                                  );
+                                },
                                 child: Container(
-                                  margin: EdgeInsets.only(
-                                    left: 14 / 6.4 * boxSizeV,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffF8F8F8),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border:
+                                        Border.all(color: Color(0xffCBCBCB)),
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        margin: EdgeInsets.only(
-                                          top: 14 / 6.4 * boxSizeV,
-                                        ),
-                                        height: 85 / 6.4 * boxSizeV,
-                                        width: 260 / 3.6 * boxSizeH,
-                                        child: Container(
+                                  margin: EdgeInsets.only(
+                                    bottom: 8 / 6.4 * boxSizeV,
+                                  ),
+                                  height: 160 / 6.4 * boxSizeV,
+                                  width: 291 / 3.6 * boxSizeH,
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                      left: 14 / 6.4 * boxSizeV,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
                                           margin: EdgeInsets.only(
-                                            top: 6 / 6.4 * boxSizeV,
-                                            right: 10 / 3.6 * boxSizeH,
+                                            top: 14 / 6.4 * boxSizeV,
                                           ),
-                                          alignment: Alignment.topRight,
-                                          child: Icon(
-                                            FontAwesomeIcons.solidHeart,
-                                            color: Color(0xffFFCB00),
+                                          height: 85 / 6.4 * boxSizeV,
+                                          width: 260 / 3.6 * boxSizeH,
+                                          child: Container(
+                                            margin: EdgeInsets.only(
+                                              top: 6 / 6.4 * boxSizeV,
+                                              right: 10 / 3.6 * boxSizeH,
+                                            ),
+                                            alignment: Alignment.topRight,
+                                            child: Icon(
+                                              FontAwesomeIcons.solidHeart,
+                                              color: Color(0xffFFCB00),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Text(
-                                        'Juju\'s Shop',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22),
-                                      ),
-                                      SizedBox(
-                                        height: 2,
-                                      ),
-                                      Text(
-                                        'Shop No. xyz',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                      ),
-                                    ],
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Text(
+                                          'Juju\'s Shop',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 22),
+                                        ),
+                                        SizedBox(
+                                          height: 2,
+                                        ),
+                                        Text(
+                                          'Shop No. xyz',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -432,25 +472,36 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(
-                      top: 559 / 6.4 * boxSizeV, left: 148 / 3.6 * boxSizeH),
-                  height: 64 / 6.4 * boxSizeV,
-                  width: 64 / 3.6 * boxSizeH,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 7,
+                GestureDetector(
+                  onTap: () {
+                    print('tap');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TrackingPage(),
                       ),
-                    ],
-                    shape: BoxShape.circle,
-                    color: Colors.black,
-                  ),
-                  child: Icon(
-                    Icons.swap_vert,
-                    color: Colors.white,
+                    );
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(
+                        top: 559 / 6.4 * boxSizeV, left: 148 / 3.6 * boxSizeH),
+                    height: 64 / 6.4 * boxSizeV,
+                    width: 64 / 3.6 * boxSizeH,
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 7,
+                        ),
+                      ],
+                      shape: BoxShape.circle,
+                      color: Colors.black,
+                    ),
+                    child: Icon(
+                      Icons.swap_vert,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],

@@ -27,13 +27,12 @@ const userSchema = new mongoose.Schema({
   otp: {
     code: {
       type: String,
-      required: true,
-      trim: true
+      trim: true,
     },
     validity: {
       type: Date,
       default: new Date(Date.now() + 15 * 60 * 1000),
-    }
+    },
   },
   verified: {
     type: Boolean,
@@ -44,6 +43,10 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
   isGoogleUser: {
+    type: Boolean,
+    default: false,
+  },
+  isPhoneVerified: {
     type: Boolean,
     default: false,
   },
@@ -58,7 +61,7 @@ userSchema.methods.matchOtp = function (enteredOtp) {
 };
 
 // Encrypt password using bcrypt
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   // Check if the password is modified or not, if it is not then move along, don't perform the hashing stuff
   if (!this.isModified('password')) {
     next();
@@ -68,9 +71,24 @@ userSchema.pre('save', async function(next) {
 });
 
 // Sign JWT and return
-userSchema.methods.getSignedJwtToken = function() {
+userSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWTTOKEN);
 };
+
+// Check if the profile is complete with all the relevant details or not!
+userSchema.virtual('isCompleted').get(function () {
+  if (
+    this.name !== undefined &&
+    this.phone !== undefined &&
+    this.email !== undefined &&
+    this.password !== undefined &&
+    this.hostel !== undefined
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+});
 
 const User = mongoose.model('users', userSchema);
 module.exports = User;

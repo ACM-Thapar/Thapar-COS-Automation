@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'PageResizing/Variables.dart';
-import 'PageResizing/WidgetResizing.dart';
 
 class SettingPage extends StatefulWidget {
   @override
@@ -14,10 +13,6 @@ class _SettingPageState extends State<SettingPage> {
   bool eText = true, pText = true;
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    boxSizeH = SizeConfig.safeBlockHorizontal;
-    boxSizeV = SizeConfig.safeBlockVertical;
-
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
