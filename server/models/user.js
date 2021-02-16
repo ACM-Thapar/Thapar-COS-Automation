@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema({
   otp: {
     code: {
       type: String,
-      required: true,
       trim: true,
     },
     validity: {
@@ -44,6 +43,10 @@ const userSchema = new mongoose.Schema({
     trim: true,
   },
   isGoogleUser: {
+    type: Boolean,
+    default: false,
+  },
+  isPhoneVerified: {
     type: Boolean,
     default: false,
   },
@@ -71,6 +74,21 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWTTOKEN);
 };
+
+// Check if the profile is complete with all the relevant details or not!
+userSchema.virtual('isCompleted').get(function () {
+  if (
+    this.name !== undefined &&
+    this.phone !== undefined &&
+    this.email !== undefined &&
+    this.password !== undefined &&
+    this.hostel !== undefined
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+});
 
 const User = mongoose.model('users', userSchema);
 module.exports = User;

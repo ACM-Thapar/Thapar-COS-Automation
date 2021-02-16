@@ -1,15 +1,17 @@
+// * NPM Packages
 const express = require('express');
-const router = express.Router();
-const { check, validationResult } = require('express-validator');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const authController = require('../controllers/authcontrollers');
-const Shopkeeper = require('../models/shopkeeper');
-const { userInfo } = require('os');
 const passport = require('passport');
+
+const router = express.Router();
+
+// * Controllers
+const authController = require('../controllers/authcontrollers');
+
+// * Middlewares
 const { protectShopkeeper } = require('../middleware/auth');
 
 router.post('/signup', authController.post_signup);
+router.post('/firebase-signup', authController.firebaseRegisterShopkeeper);
 router.post('/login', authController.post_login);
 router.post('/verify-otp', [protectShopkeeper], authController.verifyOtp);
 router.put(
@@ -18,6 +20,11 @@ router.put(
   authController.regenerateOtp,
 );
 router.get('/me', [protectShopkeeper], authController.getMe);
+router.put(
+  '/complete-profile',
+  [protectShopkeeper],
+  authController.completeProfile,
+);
 
 // auth with google
 router.get(
