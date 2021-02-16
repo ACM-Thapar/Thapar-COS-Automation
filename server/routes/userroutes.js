@@ -9,11 +9,11 @@ const { userInfo } = require('os');
 const passport = require('passport');
 const { protectUser } = require('../middleware/auth');
 
-router.post('/signup', userController.post_signup);
-router.post('/login', userController.post_login);
+router.post('/signup',[check('email','Must be a valid email ').isEmail(),check('phone','Must be a valid phone number').isLength({min:10,max:10})],userController.post_signup);
+router.post('/login',[check('email','Must be a valid email ').isEmail(),check('phone','Must be a valid phone number').isLength({min:10,max:10})], userController.post_login);
 router.post('/verify-otp', [protectUser], userController.verifyOtp);
 router.put('/regenerate-otp', [protectUser], userController.regenerateOtp);
-router.get('/me', [protectUser], userController.getMe);
+router.get('/me', [check('email','Must be a valid email ').isEmail(),check('phone','Must be a valid phone number').isLength({min:10,max:10})],[protectUser], userController.getMe);
 
 // auth with google
 router.get(
