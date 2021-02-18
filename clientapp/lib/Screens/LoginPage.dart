@@ -130,12 +130,12 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(),
-                            ),
-                          );
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                              (_) => false);
                         },
                         child: Container(
                           alignment: Alignment.center,

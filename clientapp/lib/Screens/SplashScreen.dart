@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:clientapp/Screens/HomePage.dart';
+import 'package:clientapp/Screens/OTP_Verification/OTP-2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,17 +35,63 @@ class _SplashScreenState extends State<SplashScreen> {
     final bool userType = store.getBool('userType');
     print('TOKEN : $token  :FUSER: $user ::TYPE $userType');
     if (token != null) {
-      final String json = await widget.serverRequests.getUser(token, userType);
-      // widget.appUser.fromServer(json); //SETTING THE USER IN PROVIDER
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (BuildContext context) => HomePage(),
-        ),
-      );
+      //USER SIGNED IN FIREBASE AND SERVER -> Email & Pass SignUp
+      String json;
+      try {
+        json = await widget.serverRequests.getUser(token, userType);
+      } on PlatformException catch (e) {
+        //TODO ASK WHAT TO DO MAYBE SIGIN AGAIN
+      }
+      if (json != null) {
+        widget.appUser.fromServer(json); //SETTING THE AppUSER IN PROVIDER
+
+        //check profile complete or not
+        final jsonObj = jsonDecode(json);
+        if (jsonObj['data']['verified'] == false) {
+          //Email & Pass SignUp
+          //EMAIL LEFT ->Phone and hostel left
+          bool success;
+          try {
+            success = await widget.serverRequests.regenerateOtp();
+          } on PlatformException catch (e) {
+            //TODO ASK WHAT AGAIN SIGN OR what
+          }
+          if (success) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => OTP2(),
+              ),
+            );
+          }
+        } else if (jsonObj['data']['verified'] == true &&
+            jsonObj['data']['phone'] == null &&
+            jsonObj['data']['hostel'] == null) {
+          //Email & Pass SignUp
+          //Email verified
+          //PHONE AND HOSTEL LEFT
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => OTP1(),
+            ),
+          );
+        } else {
+          //MAUBE EMAIL OR Gsign
+          //FULL PROFILE COMPLETE
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => HomePage(),
+            ),
+          );
+        }
+      }
     } else if (user != null) {
-      widget.appUser.fromFirebase(user);
+      //Gsign
+      widget.appUser.fromFirebase(user); //SETTING THE AppUSER IN PROVIDER
       if (user.phoneNumber == null || user.phoneNumber == '') {
+        //Gsign but phone not verify ->No server account
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -51,6 +99,8 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         );
       } else {
+        //Gsign & phone done
+        //Hostel Left -> no server account
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -59,6 +109,7 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     } else {
+      //User has no account
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

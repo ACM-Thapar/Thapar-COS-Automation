@@ -151,7 +151,11 @@ class _OTP1State extends State<OTP1> {
         userCreds.user.phoneNumber != null &&
         userCreds.user.phoneNumber.isNotEmpty) {
       print('AFER OTP DONE : ${FirebaseAuth.instance.currentUser.phoneNumber}');
-      Provider.of<AppUser>(context, listen: false).fromFirebase(userCreds.user);
+      FirebaseAuth.instance.currentUser.emailVerified
+          ? Provider.of<AppUser>(context, listen: false)
+              .fromFirebase(userCreds.user)
+          : Provider.of<AppUser>(context, listen: false)
+              .fromForm(phone: FirebaseAuth.instance.currentUser.phoneNumber);
       return true;
     } else
       return false;

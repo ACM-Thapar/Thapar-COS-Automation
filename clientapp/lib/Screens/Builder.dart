@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -142,69 +144,84 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              widget.type ? ShopProfile() : HomePage(),
-                        ),
-                      );
-                    },
-                    child: GestureDetector(
-                      onTap: () async {
-                        Provider.of<AppUser>(context, listen: false).hostel =
-                            'H'; //TODO REMOVE THIS AND PLACE AT CORRECT POSITION
-                        // Provider.of<AppUser>(context, listen: false)
-                        //     .printUser();
-                        showDialog(
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => WillPopScope(
-                            onWillPop: () =>
-                                Future.delayed(Duration(), () => false),
-                            child: Dialog(
-                              backgroundColor: Colors.transparent,
-                              elevation: 0,
-                              child: Center(
-                                child: CircularProgressIndicator(),
-                              ),
+                    onTap: () async {
+                      Provider.of<AppUser>(context, listen: false).hostel =
+                          'H'; //TODO REMOVE THIS AND PLACE AT CORRECT POSITION
+                      // Provider.of<AppUser>(context, listen: false)
+                      //     .printUser();
+                      showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (context) => WillPopScope(
+                          onWillPop: () =>
+                              Future.delayed(Duration(), () => false),
+                          child: Dialog(
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            child: Center(
+                              child: CircularProgressIndicator(),
                             ),
                           ),
-                        );
+                        ),
+                      );
 
-                        if (await Provider.of<ServerRequests>(context,
-                                listen: false)
-                            .registerGoogle(
-                                Provider.of<AppUser>(context, listen: false))) {
+                      if (FirebaseAuth.instance.currentUser.emailVerified) {
+                        bool success;
+                        try {
+                          success = await Provider.of<ServerRequests>(context,
+                                  listen: false)
+                              .registerGoogle(
+                                  Provider.of<AppUser>(context, listen: false));
+                        } on PlatformException catch (e) {
+                          //TODO SHOW ERROR
+                          print(e.message);
+                          success = false;
+                        }
+                        if (success) {
                           Navigator.pop(context);
                           Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
                                 builder: (context) => HomePage(),
                               ),
                               (_) => false);
-                        } else {
-                          Navigator.pop(context);
-                          print('error from server');
-                          // TODO: SHOW ERROR
                         }
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(top: 25),
-                        alignment: Alignment.center,
-                        width: 291 * boxSizeH / 3.6,
-                        height: 58 * boxSizeV / 6.4,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(14)),
-                          color: Colors.black,
-                        ),
-                        child: Text(
-                          'Save',
-                          style: GoogleFonts.josefinSans(
-                            fontSize: 25,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      } else {
+                        bool success;
+                        try {
+                          success = await Provider.of<ServerRequests>(context,
+                                  listen: false)
+                              .updateProfile(
+                                  Provider.of<AppUser>(context, listen: false));
+                        } on PlatformException catch (e) {
+                          //TODO SHOW ERROR
+                          print(e.message);
+                          success = false;
+                        }
+                        if (success) {
+                          Navigator.pop(context);
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                              (_) => false);
+                        }
+                      }
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(top: 25),
+                      alignment: Alignment.center,
+                      width: 291 * boxSizeH / 3.6,
+                      height: 58 * boxSizeV / 6.4,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        color: Colors.black,
+                      ),
+                      child: Text(
+                        'Save',
+                        style: GoogleFonts.josefinSans(
+                          fontSize: 25,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

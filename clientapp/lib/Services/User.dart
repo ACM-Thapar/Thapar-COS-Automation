@@ -28,8 +28,14 @@ class AppUser {
   String get phone => this._phone;
 
   void fromServer(String json) {
-    final res = jsonDecode(json);
-    this._setProfile(); //TODO IMPLENT tHIS ON BASIS OF RESPONSE FROM SERVER
+    final res = jsonDecode(json)['data'];
+    this._setProfile(
+      name: res['name'],
+      email: res['email'],
+      phone: res['phone'],
+      password: res['password'],
+    );
+    this.hostel = res['hostel'];
   }
 
   void fromFirebase(User firebaseUser) {
@@ -38,6 +44,20 @@ class AppUser {
       email: firebaseUser.email,
       password: firebaseUser.uid,
       phone: firebaseUser.phoneNumber,
+    );
+  }
+
+  void fromForm({
+    String name,
+    String email,
+    String password,
+    String phone,
+  }) {
+    _setProfile(
+      name: name,
+      email: email,
+      password: password,
+      phone: phone,
     );
   }
 

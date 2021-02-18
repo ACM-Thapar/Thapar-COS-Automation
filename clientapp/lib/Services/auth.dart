@@ -5,6 +5,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../Variables.dart';
 
 class Auth {
+  Future<void> formAuth({String email, String password}) async {
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+  }
+
   Future<UserCredential> googleAuth() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(
         hostedDomain: store.getBool('userType') ? 'thapar.edu' : null);

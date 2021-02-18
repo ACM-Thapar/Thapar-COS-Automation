@@ -1,7 +1,7 @@
+import 'package:clientapp/Screens/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../Screens/Registeruserpage.dart';
 import '../Variables.dart';
 import '../WidgetResizing.dart';
 
@@ -119,7 +119,7 @@ class _UserTypeState extends State<UserType> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Registeruser(),
+                              builder: (context) => LoginPage(),
                             ),
                           );
                         },
@@ -140,7 +140,7 @@ class _UserTypeState extends State<UserType> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Registeruser(),
+                              builder: (context) => LoginPage(),
                             ),
                           );
                         },
