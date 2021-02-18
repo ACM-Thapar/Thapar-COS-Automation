@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timelines/timelines.dart';
 
-import '../PageResizing/Variables.dart';
+import '../Variables.dart';
 
 // TODO: REFACTOR TRACKING PAGE
 final _processes = [
@@ -174,7 +174,7 @@ class _ItemState extends State<Item> {
               setState(() {
                 open = !open;
               });
-              print('ok');
+              // print('ok');
             },
             child: Container(
               height: 40 / 6.4 * boxSizeV,

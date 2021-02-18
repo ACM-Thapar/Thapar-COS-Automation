@@ -1,51 +1,53 @@
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class AppUser {
-  User _firebaseUser;
   String _name;
   String _email;
   String _password;
   String _phone;
-  String _hostel;
-  bool _user;
-  void setFirebaseuser({
-    User firebaseUser,
-  }) {
-    _firebaseUser = firebaseUser;
-  }
+  String hostel;
+  // bool user; REMOVED SAVED IN SHAREDPREFERENCES
+  // bool gSign = true; REMOVED THIS CAN USE FIREBASE ISEMAILVERIFIED method
 
-  void setProfile({
+  void _setProfile({
     String name,
     String email,
     String password,
     String phone,
-    String hostel,
-    bool user,
   }) {
     this._name = name ?? this._name;
     this._email = email ?? this._email;
     this._password = password ?? this._password;
     this._phone = phone ?? this._phone;
-    this._hostel = hostel ?? this._hostel;
-    this._user = user ?? this._user;
   }
 
   String get name => this._name;
   String get email => this._email;
   String get password => this._password;
   String get phone => this._phone;
-  String get hostel => this._hostel;
-  bool get user => this._user;
-  User get firebaseUser => _firebaseUser;
 
-  void printUser(AppUser user) {
-    print(user._name);
-    print(user._email);
-    print(user._password);
-    print('phone ${user._phone}');
-    print(user._hostel);
-    print(user._user);
+  void fromServer(String json) {
+    final res = jsonDecode(json);
+    this._setProfile(); //TODO IMPLENT tHIS ON BASIS OF RESPONSE FROM SERVER
+  }
+
+  void fromFirebase(User firebaseUser) {
+    this._setProfile(
+      name: firebaseUser.displayName,
+      email: firebaseUser.email,
+      password: firebaseUser.uid,
+      phone: firebaseUser.phoneNumber,
+    );
+  }
+
+  void printUser() {
+    print('USER DETAILS');
+    print(this._name);
+    print(this._email);
+    print(this._password);
+    print('phone ${this._phone}');
+    print(this.hostel);
+    print('DETAILS END');
   }
 }

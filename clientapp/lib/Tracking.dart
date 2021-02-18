@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timelines/timelines.dart';
 
-import 'PageResizing/Variables.dart';
+import 'Variables.dart';
 
 final _processes = [
   'Confirmed',
@@ -173,7 +173,6 @@ class _ItemState extends State<Item> {
               setState(() {
                 open = !open;
               });
-              print('ok');
             },
             child: Container(
               height: 40 / 6.4 * boxSizeV,

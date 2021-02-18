@@ -1,4 +1,4 @@
-import 'package:clientapp/PageResizing/Variables.dart';
+import 'package:clientapp/Variables.dart';
 import '../Intro/Intro1.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -7,31 +7,65 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Screens/UserType.dart';
-import '../PageResizing/Variables.dart';
-import '../PageResizing/WidgetResizing.dart';
+import '../Services/User.dart';
+import './Intro/Intro1.dart';
+import './OTP_Verification/OTP-1.dart';
+import '../Services/ServerRequests.dart';
+import '../Variables.dart';
+import '../WidgetResizing.dart';
 
 class SplashScreen extends StatefulWidget {
+  final ServerRequests serverRequests;
+  final AppUser appUser;
+  SplashScreen({this.serverRequests, this.appUser});
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
   Timer startTimeout() {
-    return Timer(Duration(seconds: 3), changeScreen);
+    return Timer(Duration(seconds: 2), changeScreen);
   }
 
   void changeScreen() async {
-    FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return FirebaseAuth.instance.currentUser != null
-              ? HomePage()
-              : UserType();
-        },
-      ),
-    );
+    final User user = FirebaseAuth.instance.currentUser;
+    final String token = store.getString('token');
+    final bool userType = store.getBool('userType');
+    print('TOKEN : $token  :FUSER: $user ::TYPE $userType');
+    if (token != null) {
+      final String json = await widget.serverRequests.getUser(token, userType);
+      // widget.appUser.fromServer(json); //SETTING THE USER IN PROVIDER
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => HomePage(),
+        ),
+      );
+    } else if (user != null) {
+      widget.appUser.fromFirebase(user);
+      if (user.phoneNumber == null || user.phoneNumber == '') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => OTP1(),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (BuildContext context) => Intro1(),
+          ),
+        );
+      }
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => UserType(),
+        ),
+      );
+    }
   }
 
   @override

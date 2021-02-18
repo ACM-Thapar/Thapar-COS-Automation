@@ -30,11 +30,10 @@ dependencies:
   google_fonts: ^1.1.1
   google_sign_in: ^4.5.9
   intl_phone_number_input: ^0.5.1
-  libphonenumber: ^1.0.2
-  material_design_icons_flutter: ^4.0.5755
+  material_design_icons_flutter: ^4.0.5855
   otp_text_field: ^1.0.1
   provider: ^4.3.3
-  sms_autofill: ^1.3.1
+  shared_preferences: ^0.5.12+4
   timelines: ^0.0.2+1
 
 dev_dependencies:

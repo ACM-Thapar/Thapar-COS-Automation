@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import './HomePage.dart';
-import '../PageResizing/Variables.dart';
+import '../Variables.dart';
 
 class ShopProfile extends StatefulWidget {
   @override

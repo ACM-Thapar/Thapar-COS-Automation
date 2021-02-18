@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../PageResizing/Variables.dart';
+import '../Variables.dart';
 
 class SettingPage extends StatefulWidget {
   @override

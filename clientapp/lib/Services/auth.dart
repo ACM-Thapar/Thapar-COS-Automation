@@ -2,30 +2,55 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../Variables.dart';
+
 class Auth {
   Future<UserCredential> googleAuth() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+        hostedDomain: store.getBool('userType') ? 'thapar.edu' : null);
+    GoogleSignInAccount googleSignInAccount;
+    GoogleSignInAuthentication googleSignInAuthentication;
+    UserCredential authResult;
+    googleSignInAccount =
+        await googleSignIn.signIn(); //NEVER GIVES EXCEPTION SO IF ELSE CHECK
     if (googleSignInAccount != null) {
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
-      if (googleSignInAuthentication.accessToken != null &&
-          googleSignInAuthentication.idToken != null) {
-        print(googleSignInAuthentication.accessToken);
-        final authResult = FirebaseAuth.instance.signInWithCredential(
+      try {
+        googleSignInAuthentication = await googleSignInAccount.authentication;
+      } on Exception catch (e) {
+        print(
+            'GOOGLE ERROR CAUGHT CUSTOM ERROR SENT ERROR GIVEN::${e.toString()}');
+        throw PlatformException(
+            code: 'Google_Auth_Failed',
+            message: 'Google Authentication Failed');
+      }
+      try {
+        authResult = await FirebaseAuth.instance.signInWithCredential(
           GoogleAuthProvider.credential(
-              idToken: googleSignInAuthentication.idToken,
+              idToken: null,
               accessToken: googleSignInAuthentication.accessToken),
         );
-        return authResult;
-      } else {
-        throw PlatformException(
-            code: 'Error_Missing_Google_Auth_Token',
-            message: 'Missing Google Auth Token');
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'account-exists-with-different-credential')
+          throw PlatformException(
+              code:
+                  'Email_Already_In_Use', //ONLY IF ALREADY GOOGLE, PRIORITY ORDER GOOGLE>FB>Email&Pas
+              message: 'There is already an account with this email');
+        else if (e.code == 'user-disabled')
+          throw PlatformException(code: e.code, message: e.message);
+        else {
+          print('Something went WRONG HERE');
+          throw PlatformException(
+              code: 'Google_Auth_Failed',
+              message: 'Google Authentication Failed');
+        }
+      } catch (error) {
+        print(error.toString());
       }
-    } else {
+    } else
       throw PlatformException(
-          code: 'Error_Aborted_by_User', message: 'Sign in aborted by user');
-    }
+          code: 'Error_Aborted_by_User',
+          message:
+              'Sign in aborted by user'); //NEVER CAUGHT IN APP  ONLY WHEN DEBUGGING IT CATCHES THE EXCEPTION
+    return authResult;
   }
 }
