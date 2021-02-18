@@ -1,5 +1,6 @@
 // * NPM Packages
 const express = require('express');
+const { check, validationResult } = require('express-validator');
 const passport = require('passport');
 
 const router = express.Router();
@@ -10,13 +11,15 @@ const userController = require('../controllers/usercontrollers');
 // * Middlewares
 const { protectUser } = require('../middleware/auth');
 
-router.post('/signup', userController.post_signup);
-router.post('/firebase-signup', userController.firebaseRegister);
-router.post('/login', userController.post_login);
+
+
+router.post('/signup', [check('email','Must be a valid email ').isEmail()],userController.post_signup);
+router.post('/firebase-signup',[check('email','Must be a valid email ').isEmail()], userController.firebaseRegister);
+router.post('/login',[check('email','Must be a valid email ').isEmail()], userController.post_login);
 router.post('/verify-otp', [protectUser], userController.verifyOtp);
 router.put('/regenerate-otp', [protectUser], userController.regenerateOtp);
-router.get('/me', [protectUser], userController.getMe);
-router.put('/complete-profile', [protectUser], userController.completeProfile);
+router.get('/me',[check('email','Must be a valid email ').isEmail(),], [protectUser], userController.getMe);
+router.put('/complete-profile', [check('email','Must be a valid email ').isEmail(),],[protectUser], userController.completeProfile);
 
 // auth with google
 router.get(

@@ -1,5 +1,6 @@
 // * NPM Packages
 const express = require('express');
+const { check, validationResult } = require('express-validator');
 const passport = require('passport');
 
 const router = express.Router();
@@ -10,9 +11,9 @@ const authController = require('../controllers/authcontrollers');
 // * Middlewares
 const { protectShopkeeper } = require('../middleware/auth');
 
-router.post('/signup', authController.post_signup);
-router.post('/firebase-signup', authController.firebaseRegisterShopkeeper);
-router.post('/login', authController.post_login);
+router.post('/signup',[check('email','Must be a valid email').isEmail(),check('password','Must be a valid password of minimum 4 characters').isLength({min:4})], authController.post_signup);
+router.post('/firebase-signup',[check('email','Must be a valid email').isEmail(),check('password','Must be a valid password of minimum 4 characters').isLength({min:4})], authController.firebaseRegisterShopkeeper);
+router.post('/login',[check('email','Must be a valid email').isEmail(),check('password','Must be a valid password of minimum 4 characters').isLength({min:4})], authController.post_login);
 router.post('/verify-otp', [protectShopkeeper], authController.verifyOtp);
 router.put(
   '/regenerate-otp',
