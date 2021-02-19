@@ -28,7 +28,6 @@ const shopkeeperSchema = new mongoose.Schema(
     otp: {
       code: {
         type: String,
-        required: true,
         trim: true,
       },
       validity: {
@@ -45,6 +44,10 @@ const shopkeeperSchema = new mongoose.Schema(
       id: String,
     },
     isGoogleUser: {
+      type: Boolean,
+      default: false,
+    },
+    isPhoneVerified: {
       type: Boolean,
       default: false,
     },
@@ -83,6 +86,20 @@ shopkeeperSchema.pre('save', async function (next) {
 shopkeeperSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWTTOKEN);
 };
+
+// Check if the profile is complete with all the relevant details or not!
+shopkeeperSchema.virtual('isCompleted').get(function () {
+  if (
+    this.name !== undefined &&
+    this.phone !== undefined &&
+    this.email !== undefined &&
+    this.password !== undefined
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+});
 
 const Shopkeeper = mongoose.model('shopkeepers', shopkeeperSchema);
 module.exports = Shopkeeper;
