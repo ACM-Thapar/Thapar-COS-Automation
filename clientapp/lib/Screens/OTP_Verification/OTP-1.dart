@@ -136,7 +136,29 @@ class _OTP1State extends State<OTP1> {
                 ),
               ),
             ),
-          )
+          ),
+          SizedBox(height: 15 * boxSizeV / 6.4),
+          Container(
+              // padding: EdgeInsets.symmetric(horizontal: 2 * boxSizeH),
+              // decoration: BoxDecoration(border: Border.all()),
+              child: RichText(
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                      text: 'Note:',
+                      style: GoogleFonts.josefinSans(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black),
+                      children: [
+                        TextSpan(
+                            text: ' Make sure this is your mobile\'s ',
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black54)),
+                        TextSpan(text: 'SIM-1')
+                      ])))
         ],
       );
 
@@ -217,6 +239,8 @@ class _OTP1State extends State<OTP1> {
     boxSizeH = SizeConfig.safeBlockHorizontal;
     boxSizeV = SizeConfig.safeBlockVertical;
     return WillPopScope(
+      //EXIT APP ERROR
+      // print('EXIT APP');
       onWillPop: () => Future.delayed(
           Duration(),
           () =>
@@ -228,7 +252,7 @@ class _OTP1State extends State<OTP1> {
               //         false
               //       }
               //     :
-              true), //TODO:ASK LOGOUT HERE AND IF YES THE DELETE USER FIREBASE
+              true),
       child: SafeArea(
         child: Scaffold(
           body: Container(
@@ -262,7 +286,7 @@ class _OTP1State extends State<OTP1> {
                     // decoration: BoxDecoration(border: Border.all()),
                   ),
                   SizedBox(
-                    height: 92 * boxSizeV / 6.4,
+                    height: 75 * boxSizeV / 6.4,
                   ),
                   Container(
                     height: 113.92 * boxSizeV / 6.4,

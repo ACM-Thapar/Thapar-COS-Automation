@@ -27,12 +27,16 @@ class AppUser {
   String get password => this._password;
   String get phone => this._phone;
 
+  void setPhone(String phone) {
+    this._phone = phone;
+  }
+
   void fromServer(String json) {
     final res = jsonDecode(json)['data'];
     this._setProfile(
       name: res['name'],
       email: res['email'],
-      phone: res['phone'],
+      phone: res['phone'].toString(),
       password: res['password'],
     );
     this.hostel = res['hostel'];

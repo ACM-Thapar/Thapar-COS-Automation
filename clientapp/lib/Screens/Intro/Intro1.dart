@@ -26,9 +26,11 @@ class _Intro1State extends State<Intro1> {
     boxSizeH = SizeConfig.safeBlockHorizontal;
     boxSizeV = SizeConfig.safeBlockVertical;
     return WillPopScope(
+      //EXIT APP ERROR
+      // print('EXIT APP');
       onWillPop: () => Future.delayed(
         Duration(),
-        () => false, //TODO : ASK FOR LOGOUT
+        () => false,
       ),
       child: SafeArea(
         child: Scaffold(

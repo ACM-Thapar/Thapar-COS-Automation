@@ -9,7 +9,7 @@ class ServerRequests {
   final String _url = 'https://protected-oasis-19586.herokuapp.com/api';
 
   Future<bool> registerGoogle(AppUser appUser) async {
-    print('REQUEST SENT');
+    print('GsignUp SENT');
     http.Response res = await http.post(
       '$_url/${store.getBool('userType') ? 'user' : 'auth'}/firebase-signup',
       headers: <String, String>{
@@ -17,22 +17,31 @@ class ServerRequests {
       },
       body: jsonEncode(<String, String>{
         'name': appUser.name,
-        'phone': appUser.phone,
         'email': appUser.email,
         'password': appUser.password,
-        if (store.getBool('userType')) 'hostel': appUser.hostel,
       }),
     );
     if (res.statusCode == 200) {
+      print('DONE');
       await store.setString('token', jsonDecode(res.body)['token']);
       return true;
-    } else
+    } else {
+      print(res.statusCode);
+      print(res.body);
       throw PlatformException(
           code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
+    }
   }
 
   Future<bool> registerForm(AppUser appUser) async {
-    print('REQUEST SENT');
+    print('Form SignUp SENT');
+    print(
+      jsonEncode(<String, String>{
+        'name': appUser.name,
+        'email': appUser.email,
+        'password': appUser.password,
+      }),
+    );
     http.Response res = await http.post(
       '$_url/${store.getBool('userType') ? 'user' : 'auth'}/signup',
       headers: <String, String>{
@@ -56,13 +65,16 @@ class ServerRequests {
       // EMAIL SENT AUTO
       await store.setString('token', jsonDecode(res.body)['token']);
       return true;
-    } else
+    } else {
+      print(res.statusCode);
+      print(res.body);
       throw PlatformException(
           code: 'Error from server'); //TODO : IMPLEMENT ERRORS FROM SERVER
+    }
   }
 
   Future<String> getUser(String token, bool user) async {
-    print('GET SENT');
+    print('GET User SENT');
     http.Response res = await http.get(
       '$_url/${user ? 'user' : 'auth'}/me',
       headers: {
@@ -134,7 +146,9 @@ class ServerRequests {
       }
       */
       return res.body;
-    } else
+    } else {
+      print(res.statusCode);
+      print(res.body);
       /*
       {
           "success": false,
@@ -143,10 +157,11 @@ class ServerRequests {
       */
       throw PlatformException(
           code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
+    }
   }
 
   Future<bool> checkOTP(String otp) async {
-    print('REQUEST SENT');
+    print('Otp Check SENT');
     http.Response res = await http.post(
       '$_url/${store.getBool('userType') ? 'user' : 'auth'}/verify-otp',
       headers: <String, String>{
@@ -161,6 +176,8 @@ class ServerRequests {
       //returns a string message verified
       return true;
     } else {
+      print(res.statusCode);
+      print(res.body);
       /*
     {
         "errors": [
@@ -176,7 +193,7 @@ class ServerRequests {
   }
 
   Future<bool> regenerateOtp() async {
-    print('REQUEST SENT');
+    print('Otp Resend SENT');
     http.Response res = await http.put(
       '$_url/${store.getBool('userType') ? 'user' : 'auth'}/regenerate-otp',
       headers: <String, String>{
@@ -194,6 +211,8 @@ class ServerRequests {
     */
       return true;
     } else {
+      print(res.statusCode);
+      print(res.body);
       /*
     {
     "success": false,
@@ -206,7 +225,7 @@ class ServerRequests {
   }
 
   Future<bool> updateProfile(AppUser appUser) async {
-    print('REQUEST SENT');
+    print('Update Profile SENT');
     http.Response res = await http.put(
       '$_url/${store.getBool('userType') ? 'user' : 'auth'}/complete-profile',
       headers: <String, String>{
@@ -243,6 +262,8 @@ class ServerRequests {
       */
       return true;
     } else {
+      print(res.statusCode);
+      print(res.body);
       /*
     {
         "success": false,
@@ -252,5 +273,35 @@ class ServerRequests {
     }
     throw PlatformException(
         code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
+  }
+
+  Future<bool> login(AppUser appUser) async {
+    print('Login SENT');
+    http.Response res = await http.post(
+      '$_url/${store.getBool('userType') ? 'user' : 'auth'}/login',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': appUser.email,
+        'password': appUser.password,
+      }),
+    );
+    if (res.statusCode == 200) {
+      /*
+    {
+        "success": true,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwMzAyOTJlNzliOTFhMDAxNTlmMjRlMyIsImlhdCI6MTYxMzc2OTAxNH0.fKX7M3rJp4oYKDxV3WelPGEpGq8dzizp4EYXMNL6WWE",
+        "profileCompletion": false
+    }
+    */
+      await store.setString('token', jsonDecode(res.body)['token']);
+      return jsonDecode(res.body)['profileCompletion'];
+    } else {
+      print(res.statusCode);
+      print(res.body);
+      throw PlatformException(
+          code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
+    }
   }
 }
