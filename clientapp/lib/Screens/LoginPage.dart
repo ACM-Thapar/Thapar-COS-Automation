@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../Services/User.dart';
+import '../Services/ServerRequests.dart';
 import '../Variables.dart';
 import './Registeruserpage.dart';
 import './HomePage.dart';
@@ -15,6 +16,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  String _email, _password;
+  TextEditingController _emailController, _passwordController;
+  bool eText = true, pText = true;
+
+  @override
+  void initState() {
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -68,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Color(0xffF8F8F8),
                         ),
                         child: TextField(
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
                             fontSize: 3.8 * boxSizeV,
@@ -80,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                             focusColor: Colors.blue[800],
                           ),
                           onChanged: (value) {
-                            setState(() {});
+                            _email = value;
                           },
                         ),
                       ),
@@ -97,6 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: Color(0xffF8F8F8),
                         ),
                         child: TextField(
+                          controller: _passwordController,
                           style: TextStyle(
                             fontSize: 3.8 * boxSizeV,
                           ),
@@ -112,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                             focusColor: Colors.blue[800],
                           ),
                           onChanged: (value) {
-                            setState(() {});
+                            _password = value;
                           },
                         ),
                       ),
@@ -129,13 +143,53 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
+                        onTap: () async {
+                          if (true) //TODO : CONDITION FOR CHECK FIELDS
+                          {
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) => WillPopScope(
+                                onWillPop: () =>
+                                    Future.delayed(Duration(), () => false),
+                                child: Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 0,
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ),
                               ),
-                              (_) => false);
+                            );
+                            // final user = FirebaseAuth.instance.currentUser; //ALWAYS NULL
+                            Provider.of<AppUser>(context, listen: false)
+                                .fromForm(
+                              email: _email,
+                              password: _password,
+                            ); //SET AppUSER in Provider
+                            bool success1;
+                            try {
+                              success1 = await Provider.of<ServerRequests>(
+                                      context,
+                                      listen: false)
+                                  .login(Provider.of<AppUser>(context,
+                                      listen:
+                                          false)); //Profile will be complete always phir bhi check once
+                            } on PlatformException catch (exp) {
+                              //TODO SHOW ERROR
+                              print(exp.code);
+                            }
+                            if (success1) {
+                              Navigator.pop(context);
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(),
+                                ),
+                                (_) => false,
+                              );
+                            }
+                          }
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -171,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () {
+                                onTap: () async {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -220,44 +274,62 @@ class _LoginPageState extends State<LoginPage> {
                       Center(
                         child: GestureDetector(
                           onTap: () async {
-                            // UserCredential userCredentials;
-                            // try {
-                            //   userCredentials = await Provider.of<Auth>(context,
-                            //           listen: false)
-                            //       .googleAuth(Provider.of<AppUser>(context,
-                            //               listen: false)
-                            //           .user);
-                            // } on PlatformException catch (pltfmError) {
-                            //   //TODO :SHOW ERROR LOGIN
-                            //   print(pltfmError.message);
-                            //   print('VALUE OF userCreds::::: $userCredentials');
-                            // } catch (otherError) {
-                            //   //TODO :SHOW ERROR LOGIN
-                            //   print('otherError :::::  $otherError');
-                            //   print('VALUE OF userCreds::::: $userCredentials');
-                            // }
-                            // if (userCredentials != null) {
-                            //   User firebaseUser = userCredentials
-                            //       .user; //Getting FirebaseUser from Credentials
-                            //   Provider.of<AppUser>(context, listen: false)
-                            //       .setFirebaseuser(
-                            //           firebaseUser:
-                            //               firebaseUser); //Setting FirebaseUser for whole APP
-                            //   Provider.of<AppUser>(context, listen: false)
-                            //       .setProfile(
-                            //     name: firebaseUser.displayName,
-                            //     email: firebaseUser.email,
-                            //     password: firebaseUser.uid,
-                            //     phone: firebaseUser.phoneNumber,
-                            //   ); //Setting profile for user
-                            //   // Provider.of<AppUser>(context, listen: false)
-                            //   //     .printUser();
-                            //   Navigator.of(context).pushReplacement(
-                            //     MaterialPageRoute(
-                            //       builder: (context) => HomePage(),
-                            //     ),
-                            //   );
-                            // }
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context) => WillPopScope(
+                                onWillPop: () =>
+                                    Future.delayed(Duration(), () => false),
+                                child: Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 0,
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ),
+                              ),
+                            );
+                            UserCredential _userCredential;
+                            try {
+                              _userCredential = await Provider.of<Auth>(context,
+                                      listen: false)
+                                  .googleAuth();
+                            } on PlatformException catch (pltError) {
+                              //TODO: SHOW ERROR
+                              print(pltError.code);
+                            } catch (e) {
+                              //OTHER ERROR
+                              print(e);
+                            }
+                            if (_userCredential != null) {
+                              Provider.of<AppUser>(context, listen: false)
+                                  .fromFirebase(_userCredential
+                                      .user); //SET AppUSER in Provider
+                              bool success1;
+                              try {
+                                success1 = await Provider.of<ServerRequests>(
+                                        context,
+                                        listen: false)
+                                    .login(Provider.of<AppUser>(context,
+                                        listen:
+                                            false)); //Profile will be complete always phir bhi check once
+                              } on PlatformException catch (exp) {
+                                //TODO SHOW ERROR
+                                print(exp.code);
+                                success1 = false;
+                                Navigator.of(context).pop();
+                              }
+                              if (success1) {
+                                Navigator.pop(context);
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomePage(),
+                                  ),
+                                  (_) => false,
+                                );
+                              }
+                            }
                           },
                           child: Container(
                             alignment: Alignment.center,

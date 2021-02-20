@@ -70,7 +70,7 @@ class _RegisteruserState extends State<Registeruser> {
                           ),
                         ),
                         Container(
-                          height: 58 / 6.4 * boxSizeV,
+                          height: 50 / 6.4 * boxSizeV,
                           width: 291 / 3.6 * boxSizeH,
                           margin: EdgeInsets.only(
                             top: 32 / 6.4 * boxSizeV,
@@ -95,12 +95,12 @@ class _RegisteruserState extends State<Registeruser> {
                               focusColor: Colors.blue[800],
                             ),
                             onChanged: (value) {
-                              value = _name;
+                              _name = value;
                             },
                           ),
                         ),
                         Container(
-                          height: 58 / 6.4 * boxSizeV,
+                          height: 50 / 6.4 * boxSizeV,
                           width: 291 / 3.6 * boxSizeH,
                           margin: EdgeInsets.only(
                             top: 20 / 6.4 * boxSizeV,
@@ -125,12 +125,12 @@ class _RegisteruserState extends State<Registeruser> {
                               focusColor: Colors.blue[800],
                             ),
                             onChanged: (value) {
-                              value = _email;
+                              _email = value;
                             },
                           ),
                         ),
                         Container(
-                          height: 58 / 6.4 * boxSizeV,
+                          height: 50 / 6.4 * boxSizeV,
                           width: 291 / 3.6 * boxSizeH,
                           margin: EdgeInsets.only(
                             top: 20 / 6.4 * boxSizeV,
@@ -166,6 +166,21 @@ class _RegisteruserState extends State<Registeruser> {
                           onTap: () async {
                             if (true) //TODO : CONDITION FOR CHECK FIELDS
                             {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) => WillPopScope(
+                                  onWillPop: () =>
+                                      Future.delayed(Duration(), () => false),
+                                  child: Dialog(
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0,
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                ),
+                              );
                               Provider.of<AppUser>(context, listen: false)
                                   .fromForm(
                                 name: _name,
@@ -182,9 +197,10 @@ class _RegisteruserState extends State<Registeruser> {
                                             false)); //SEND EMAIL OTP FROM SERVER
                               } on PlatformException catch (exp) {
                                 //TODO SHOW ERROR
-                                print(exp.message);
+                                print(exp.code);
                                 success = false;
                               }
+                              Navigator.pop(context);
                               if (success) {
                                 //FIREBASE REGISTER
                                 await Provider.of<Auth>(context, listen: false)
@@ -192,7 +208,6 @@ class _RegisteruserState extends State<Registeruser> {
                                         email: _email,
                                         password:
                                             _password); //This Will never throw error
-
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
@@ -208,7 +223,7 @@ class _RegisteruserState extends State<Registeruser> {
                             height: 58 / 6.4 * boxSizeV,
                             width: 291 / 3.6 * boxSizeH,
                             margin: EdgeInsets.only(
-                              top: 33 / 6.4 * boxSizeV,
+                              top: 20 / 6.4 * boxSizeV,
                               left: 35 / 3.6 * boxSizeH,
                             ),
                             decoration: BoxDecoration(
@@ -257,7 +272,7 @@ class _RegisteruserState extends State<Registeruser> {
                             )),
                         Container(
                             margin: EdgeInsets.only(
-                              top: 32 / 6.4 * boxSizeV,
+                              top: 20 / 6.4 * boxSizeV,
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -285,6 +300,21 @@ class _RegisteruserState extends State<Registeruser> {
                         Center(
                           child: GestureDetector(
                             onTap: () async {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) => WillPopScope(
+                                  onWillPop: () =>
+                                      Future.delayed(Duration(), () => false),
+                                  child: Dialog(
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0,
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                ),
+                              );
                               UserCredential userCredentials;
                               try {
                                 userCredentials = await Provider.of<Auth>(
@@ -304,15 +334,32 @@ class _RegisteruserState extends State<Registeruser> {
                                 Provider.of<AppUser>(context, listen: false)
                                     .fromFirebase(
                                         firebaseUser); //Setting profile for user
-
-                                // Provider.of<AppUser>(context, listen: false)
-                                //     .printUser();
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                    builder: (context) => OTP1(),
-                                  ),
-                                  (_) => false,
-                                );
+                                bool success;
+                                try {
+                                  success = await Provider.of<ServerRequests>(
+                                          context,
+                                          listen: false)
+                                      .registerGoogle(Provider.of<AppUser>(
+                                          context,
+                                          listen:
+                                              false)); //CHECKS FOR DUPLICATE USER
+                                } on PlatformException catch (exp) {
+                                  //TODO SHOW ERROR
+                                  print(exp.code);
+                                  success = false;
+                                }
+                                if (success) {
+                                  Navigator.pop(context);
+                                  print('Navigating');
+                                  // Provider.of<AppUser>(context, listen: false)
+                                  //     .printUser();
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder: (context) => OTP1(),
+                                    ),
+                                    (_) => false,
+                                  );
+                                }
                               }
                             },
                             child: Container(
@@ -322,7 +369,7 @@ class _RegisteruserState extends State<Registeruser> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: 40 / 3.6 * boxSizeH),
                               margin: EdgeInsets.only(
-                                top: 20 / 6.4 * boxSizeV,
+                                top: 10 / 6.4 * boxSizeV,
                                 left: 80 / 3.6 * boxSizeH,
                                 right: 80 / 3.6 * boxSizeH,
                               ),

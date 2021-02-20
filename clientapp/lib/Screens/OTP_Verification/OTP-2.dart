@@ -1,7 +1,6 @@
 import 'package:clientapp/Services/ServerRequests.dart';
 import 'package:clientapp/Variables.dart';
 import 'package:flutter/services.dart';
-import '../Intro/Intro1.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:otp_text_field/otp_field.dart';
@@ -21,8 +20,9 @@ class _OTP2State extends State<OTP2> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () =>
-          Future.delayed(Duration(), () => false), //TODO : ASK LOGOUT
+      //EXIT APP ERROR
+      // print('EXIT APP');
+      onWillPop: () => Future.delayed(Duration(), () => false),
       child: SafeArea(
         child: Scaffold(
           body: Container(
@@ -107,48 +107,16 @@ class _OTP2State extends State<OTP2> {
                     length: 6,
                     textFieldAlignment: MainAxisAlignment.spaceAround,
                     onChanged: (v) {
-                      v = _otp;
+                      _otp = v;
                     },
                     onCompleted: (v) async {
-                      v = _otp;
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => WillPopScope(
-                          onWillPop: () =>
-                              Future.delayed(Duration(), () => false),
-                          child: Dialog(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                        ),
-                      );
-                      bool success;
-                      try {
-                        success = await Provider.of<ServerRequests>(context,
-                                listen: false)
-                            .checkOTP(_otp);
-                      } on PlatformException catch (e) {
-                        //TODO SHOW ERROR
-                        //If error is otp expired then Implement resend otp in error box
-                        print(e.message);
-                        success = false;
-                      }
-                      if (success) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => OTP1(),
-                          ),
-                        );
-                      }
+                      _otp = v;
                     },
                   )),
                   SizedBox(height: 34.5 * boxSizeV / 6.4),
                   GestureDetector(
                     onTap: () async {
+                      print(_otp);
                       showDialog(
                         barrierDismissible: false,
                         context: context,
@@ -172,8 +140,9 @@ class _OTP2State extends State<OTP2> {
                       } on PlatformException catch (e) {
                         //TODO SHOW ERROR
                         //If error is otp expired then Implement resend otp in error box
-                        print(e.message);
+                        print(e.code);
                         success = false;
+                        Navigator.pop(context);
                       }
                       if (success) {
                         Navigator.of(context).pushReplacement(

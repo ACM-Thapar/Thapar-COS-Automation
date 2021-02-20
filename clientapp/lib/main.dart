@@ -14,11 +14,6 @@ token
 userType
 
  */
-
-/* TODO's:
-  1)Sending phone with hostel only
-  2)Check if logged in through cache token->NULL->check firbase login->Check if phone verified using firebaseUser.phoenumber->null->OTP  NOTNULL->Intro
-*/
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

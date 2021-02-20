@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -7,9 +6,9 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:google_fonts/google_fonts.dart';
 import '../Variables.dart';
 import './HomePage.dart';
-import './ShopProfile.dart';
 import '../Services/User.dart';
 import '../Services/ServerRequests.dart';
+import './ShopProfile.dart';
 
 // TODO: REDESIGN ALL TEXTFIELD HERE
 
@@ -164,47 +163,26 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                           ),
                         ),
                       );
-
-                      if (FirebaseAuth.instance.currentUser.emailVerified) {
-                        bool success;
-                        try {
-                          success = await Provider.of<ServerRequests>(context,
-                                  listen: false)
-                              .registerGoogle(
-                                  Provider.of<AppUser>(context, listen: false));
-                        } on PlatformException catch (e) {
-                          //TODO SHOW ERROR
-                          print(e.message);
-                          success = false;
-                        }
-                        if (success) {
-                          Navigator.pop(context);
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                              (_) => false);
-                        }
-                      } else {
-                        bool success;
-                        try {
-                          success = await Provider.of<ServerRequests>(context,
-                                  listen: false)
-                              .updateProfile(
-                                  Provider.of<AppUser>(context, listen: false));
-                        } on PlatformException catch (e) {
-                          //TODO SHOW ERROR
-                          print(e.message);
-                          success = false;
-                        }
-                        if (success) {
-                          Navigator.pop(context);
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                              (_) => false);
-                        }
+                      bool success;
+                      try {
+                        success = await Provider.of<ServerRequests>(context,
+                                listen: false)
+                            .updateProfile(
+                                Provider.of<AppUser>(context, listen: false));
+                      } on PlatformException catch (e) {
+                        //TODO SHOW ERROR
+                        print(e.message);
+                        success = false;
+                      }
+                      if (success) {
+                        Navigator.pop(context);
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => store.getBool('userType')
+                                  ? HomePage()
+                                  : ShopProfile(),
+                            ),
+                            (_) => false);
                       }
                     },
                     child: Container(
