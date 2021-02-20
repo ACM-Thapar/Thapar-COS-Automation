@@ -11,9 +11,39 @@ const authController = require('../controllers/authcontrollers');
 // * Middlewares
 const { protectShopkeeper } = require('../middleware/auth');
 
-router.post('/signup',[check('email','Must be a valid email').isEmail(),check('password','Must be a valid password of minimum 4 characters').isLength({min:4})], authController.post_signup);
-router.post('/firebase-signup',[check('email','Must be a valid email').isEmail(),check('password','Must be a valid password of minimum 4 characters').isLength({min:4})], authController.firebaseRegisterShopkeeper);
-router.post('/login',[check('email','Must be a valid email').isEmail(),check('password','Must be a valid password of minimum 4 characters').isLength({min:4})], authController.post_login);
+router.post(
+  '/signup',
+  [
+    check('email', 'Must be a valid email').isEmail(),
+    check(
+      'password',
+      'Must be a valid password of minimum 4 characters',
+    ).isLength({ min: 4 }),
+  ],
+  authController.post_signup,
+);
+router.post(
+  '/firebase-signup',
+  [
+    check('email', 'Must be a valid email').isEmail(),
+    check(
+      'password',
+      'Must be a valid password of minimum 4 characters',
+    ).isLength({ min: 4 }),
+  ],
+  authController.firebaseRegisterShopkeeper,
+);
+router.post(
+  '/login',
+  [
+    check('email', 'Must be a valid email').isEmail(),
+    check(
+      'password',
+      'Must be a valid password of minimum 4 characters',
+    ).isLength({ min: 4 }),
+  ],
+  authController.post_login,
+);
 router.post('/verify-otp', [protectShopkeeper], authController.verifyOtp);
 router.put(
   '/regenerate-otp',

@@ -105,7 +105,8 @@ module.exports.firebaseRegisterShopkeeper = async (req, res) => {
 // @desc     Login Shopkeeper
 // @route    POST /api/auth/register
 // @access   Public
-module.exports.post_login = async (req, res) => { []
+module.exports.post_login = async (req, res) => {
+  [];
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -114,7 +115,7 @@ module.exports.post_login = async (req, res) => { []
   //to check if the user already exists
   try {
     console.log('reached');
-    
+
     let shopkeeper = await Shopkeeper.findOne({ email: email });
     console.log(shopkeeper);
     if (!shopkeeper) {

@@ -1,25 +1,29 @@
-import 'package:clientapp/LoginPage.dart';
-import 'package:clientapp/OTP%20Verification/OTP-1.dart';
+import 'package:clientapp/Services/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-import 'PageResizing/Variables.dart';
+import '../Services/User.dart';
+import '../Variables.dart';
+import './Registeruserpage.dart';
+import './HomePage.dart';
 
-class Registeruser extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _RegisteruserState createState() => _RegisteruserState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _RegisteruserState extends State<Registeruser> {
-  String email;
-  String password;
-  bool eText = true, pText = true;
+class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        // resizeToAvoidBottomInset: false,
-        body: SingleChildScrollView(
-          child: Container(
+    return WillPopScope(
+      onWillPop: () {
+        return Future.delayed(Duration(), () => true);
+      },
+      child: SafeArea(
+        child: Scaffold(
+          body: SingleChildScrollView(
             child: Stack(
               children: [
                 Container(
@@ -28,7 +32,7 @@ class _RegisteruserState extends State<Registeruser> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.fill,
-                      image: AssetImage('assets/MaskGroup2.png'),
+                      image: AssetImage("assets/MaskGroup2.png"),
                     ),
                   ),
                 ),
@@ -40,11 +44,11 @@ class _RegisteruserState extends State<Registeruser> {
                     children: [
                       Container(
                         margin: EdgeInsets.only(
-                          top: 123 / 6.4 * boxSizeV,
+                          top: 111 / 6.4 * boxSizeV,
                           left: 36 / 3.6 * boxSizeH,
                         ),
                         child: Text(
-                          'Create A New\nAccount',
+                          'Welcome!',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 45,
@@ -112,21 +116,33 @@ class _RegisteruserState extends State<Registeruser> {
                           },
                         ),
                       ),
+                      Container(
+                        margin: EdgeInsets.only(
+                          top: 13 / 6.4 * boxSizeV,
+                          left: 222 / 3.6 * boxSizeH,
+                        ),
+                        child: Text(
+                          'Forget Password!',
+                          style: TextStyle(
+                            color: Color(0xffFFCB00),
+                          ),
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OTP1(),
-                            ),
-                          );
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                              (_) => false);
                         },
                         child: Container(
                           alignment: Alignment.center,
                           height: 58 / 6.4 * boxSizeV,
                           width: 291 / 3.6 * boxSizeH,
                           margin: EdgeInsets.only(
-                            top: 33 / 6.4 * boxSizeV,
+                            top: 20 / 6.4 * boxSizeV,
                             left: 35 / 3.6 * boxSizeH,
                           ),
                           decoration: BoxDecoration(
@@ -135,7 +151,7 @@ class _RegisteruserState extends State<Registeruser> {
                             color: Colors.black,
                           ),
                           child: Text(
-                            'Register Now',
+                            'Log In',
                             style: TextStyle(color: Colors.white, fontSize: 21),
                           ),
                         ),
@@ -148,7 +164,7 @@ class _RegisteruserState extends State<Registeruser> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Already have an account ? ',
+                                'Not a member ?  ',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -159,12 +175,12 @@ class _RegisteruserState extends State<Registeruser> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => LoginPage(),
+                                      builder: (context) => Registeruser(),
                                     ),
                                   );
                                 },
                                 child: Text(
-                                  'Sign In',
+                                  'Join now',
                                   style: TextStyle(
                                     color: Color(0xffFFCB00),
                                     fontWeight: FontWeight.bold,
@@ -201,47 +217,70 @@ class _RegisteruserState extends State<Registeruser> {
                               ),
                             ],
                           )),
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              height: 38 / 6.4 * boxSizeV,
-                              width: 132 / 3.6 * boxSizeH,
-                              margin: EdgeInsets.only(
-                                top: 20 / 6.4 * boxSizeV,
-                                left: 35 / 3.6 * boxSizeH,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Color(0xff3B5998),
-                              ),
-                              child: Text(
-                                'Facebook',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15),
-                              ),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () async {
+                            // UserCredential userCredentials;
+                            // try {
+                            //   userCredentials = await Provider.of<Auth>(context,
+                            //           listen: false)
+                            //       .googleAuth(Provider.of<AppUser>(context,
+                            //               listen: false)
+                            //           .user);
+                            // } on PlatformException catch (pltfmError) {
+                            //   //TODO :SHOW ERROR LOGIN
+                            //   print(pltfmError.message);
+                            //   print('VALUE OF userCreds::::: $userCredentials');
+                            // } catch (otherError) {
+                            //   //TODO :SHOW ERROR LOGIN
+                            //   print('otherError :::::  $otherError');
+                            //   print('VALUE OF userCreds::::: $userCredentials');
+                            // }
+                            // if (userCredentials != null) {
+                            //   User firebaseUser = userCredentials
+                            //       .user; //Getting FirebaseUser from Credentials
+                            //   Provider.of<AppUser>(context, listen: false)
+                            //       .setFirebaseuser(
+                            //           firebaseUser:
+                            //               firebaseUser); //Setting FirebaseUser for whole APP
+                            //   Provider.of<AppUser>(context, listen: false)
+                            //       .setProfile(
+                            //     name: firebaseUser.displayName,
+                            //     email: firebaseUser.email,
+                            //     password: firebaseUser.uid,
+                            //     phone: firebaseUser.phoneNumber,
+                            //   ); //Setting profile for user
+                            //   // Provider.of<AppUser>(context, listen: false)
+                            //   //     .printUser();
+                            //   Navigator.of(context).pushReplacement(
+                            //     MaterialPageRoute(
+                            //       builder: (context) => HomePage(),
+                            //     ),
+                            //   );
+                            // }
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 38 / 6.4 * boxSizeV,
+                            // width: 132 / 3.6 * boxSizeH,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 40 / 3.6 * boxSizeH),
+                            margin: EdgeInsets.only(
+                              top: 20 / 6.4 * boxSizeV,
+                              left: 80 / 3.6 * boxSizeH,
+                              right: 80 / 3.6 * boxSizeH,
                             ),
-                            Container(
-                              alignment: Alignment.center,
-                              height: 38 / 6.4 * boxSizeV,
-                              width: 132 / 3.6 * boxSizeH,
-                              margin: EdgeInsets.only(
-                                top: 20 / 6.4 * boxSizeV,
-                                left: 35 / 3.6 * boxSizeH,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Color(0xffCBCBCB)),
-                                color: Colors.white,
-                              ),
-                              child: Text(
-                                'Google',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 15),
-                              ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Color(0xffCBCBCB)),
+                              color: Colors.white,
                             ),
-                          ],
+                            child: Text(
+                              'Google',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 15),
+                            ),
+                          ),
                         ),
                       ),
                     ],
