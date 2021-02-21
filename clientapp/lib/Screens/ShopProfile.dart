@@ -42,9 +42,8 @@ class _ShopProfileState extends State<ShopProfile> {
                   ),
                   child: TextField(
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Name',
+                      contentPadding: EdgeInsets.only(bottom: 4),
+                      labelText: 'Name',
                     ),
                   ),
                 ),
@@ -60,9 +59,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         width: 90.5 / 3.6 * boxSizeH,
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Shop No.',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Shop No.',
                           ),
                         ),
                       ),
@@ -73,9 +71,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         ),
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Category',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Category',
                             suffixIcon: Icon(
                               Icons.arrow_drop_down,
                             ),
@@ -90,9 +87,8 @@ class _ShopProfileState extends State<ShopProfile> {
                 ),
                 TextField(
                   decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                    hintText: 'Address',
+                    contentPadding: EdgeInsets.only(bottom: 4),
+                    labelText: 'Address',
                   ),
                 ),
                 SizedBox(
@@ -100,9 +96,8 @@ class _ShopProfileState extends State<ShopProfile> {
                 ),
                 TextField(
                   decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                    hintText: 'Contact No.',
+                    contentPadding: EdgeInsets.only(bottom: 4),
+                    labelText: 'Contact No.',
                   ),
                 ),
                 SizedBox(
@@ -117,9 +112,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         width: 90.5 / 3.6 * boxSizeH,
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Capacity',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Capacity',
                           ),
                         ),
                       ),
@@ -130,9 +124,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         ),
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Timing',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Timing',
                             suffixIcon: Icon(
                               Icons.arrow_drop_down,
                             ),
