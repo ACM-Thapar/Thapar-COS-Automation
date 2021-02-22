@@ -20,6 +20,27 @@ class ProfileBuilder extends StatefulWidget {
 }
 
 class _ProfileBuilderState extends State<ProfileBuilder> {
+  String _hostel;
+  List<String> hostelList = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'PG',
+    'FRD',
+    'FRE',
+    'Day Scholar',
+  ];
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -78,9 +99,8 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                           child: TextField(
                             enabled: false,
                             decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                              hintText: 'Name',
+                              contentPadding: EdgeInsets.only(bottom: 4),
+                              labelText: 'Name',
                             ),
                           ),
                         ),
@@ -93,9 +113,8 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                   TextField(
                     enabled: false,
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Email',
+                      contentPadding: EdgeInsets.only(bottom: 4),
+                      labelText: 'Email',
                     ),
                   ),
                   SizedBox(
@@ -104,23 +123,42 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                   TextField(
                     enabled: false,
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Contact No.',
+                      contentPadding: EdgeInsets.only(bottom: 4),
+                      labelText: 'Contact No.',
                     ),
                   ),
                   SizedBox(
                     height: 25,
                   ),
-                  TextField(
-                    //TODO: MAKE THIS A DROPODOWN
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Hostel',
-                      suffixIcon: Icon(Icons.arrow_drop_down),
+                  DropdownButtonFormField<String>(
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xff28ABF3),
                     ),
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        labelText: 'Hostel',
+                        labelStyle: TextStyle(
+                          fontSize: 13,
+                        ),
+                        border: InputBorder.none),
+                    icon: Icon(Icons.arrow_drop_down),
+                    items: hostelList
+                        .map((value) => DropdownMenuItem(
+                              child: Text(value.toString()),
+                              value: value,
+                            ))
+                        .toList(),
+                    onChanged: (String value) {
+                      setState(() {
+                        _hostel = value;
+                      });
+                    },
+                    value: _hostel,
                   ),
+
                   SizedBox(
                     height: 25,
                   ),
@@ -128,7 +166,7 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                   //   decoration: InputDecoration(
                   //     contentPadding:
                   //         EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                  //     hintText: 'Joined On',
+                  //     labelText: 'Joined On',
                   //   ),
                   // ),
                   Container(

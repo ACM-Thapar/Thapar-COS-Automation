@@ -75,25 +75,36 @@ class _LoginPageState extends State<LoginPage> {
                           left: 35 / 3.6 * boxSizeH,
                         ),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Color(0xffCBCBCB)),
                           color: Color(0xffF8F8F8),
                         ),
                         child: TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
-                            fontSize: 3.8 * boxSizeV,
+                            fontSize: 18,
                           ),
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)),
                             hintText: 'Email',
+                            errorText: eText
+                                ? _email != null
+                                    ? _email.contains('@thapar.edu') &&
+                                            _email.substring(
+                                                    _email.indexOf('@')) ==
+                                                '@thapar.edu'
+                                        ? null
+                                        : 'Please enter Thapar Id'
+                                    : null
+                                : 'Enter the email',
                             hintStyle: TextStyle(fontSize: 22),
                             focusColor: Colors.blue[800],
                           ),
                           onChanged: (value) {
-                            _email = value;
+                            setState(() {
+                              _email = value;
+                              eText = !(_email == null || _email == '');
+                            });
                           },
                         ),
                       ),
@@ -105,14 +116,13 @@ class _LoginPageState extends State<LoginPage> {
                           left: 35 / 3.6 * boxSizeH,
                         ),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Color(0xffCBCBCB)),
                           color: Color(0xffF8F8F8),
                         ),
                         child: TextField(
+                          obscureText: true,
                           controller: _passwordController,
                           style: TextStyle(
-                            fontSize: 3.8 * boxSizeV,
+                            fontSize: 15,
                           ),
                           decoration: InputDecoration(
                             suffixIcon: Icon(
@@ -122,11 +132,21 @@ class _LoginPageState extends State<LoginPage> {
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10)),
                             hintText: 'Password',
-                            hintStyle: TextStyle(fontSize: 22),
+                            errorText: pText
+                                ? _password != null
+                                    ? _password.length < 6
+                                        ? 'Password must have atleast 6 characters'
+                                        : null
+                                    : null
+                                : 'Enter the password',
+                            hintStyle: TextStyle(fontSize: 18),
                             focusColor: Colors.blue[800],
                           ),
                           onChanged: (value) {
-                            _password = value;
+                            setState(() {
+                              _password = value;
+                              pText = !(_password == null || _password == '');
+                            });
                           },
                         ),
                       ),
@@ -144,52 +164,59 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          if (true) //TODO : CONDITION FOR CHECK FIELDS
-                          {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (context) => WillPopScope(
-                                onWillPop: () =>
-                                    Future.delayed(Duration(), () => false),
-                                child: Dialog(
-                                  backgroundColor: Colors.transparent,
-                                  elevation: 0,
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
+                          if (_email != null && _password != null) {
+                            if (_email.contains('@thapar.edu') &&
+                                _email.substring(_email.indexOf('@')) ==
+                                    '@thapar.edu') {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) => WillPopScope(
+                                  onWillPop: () =>
+                                      Future.delayed(Duration(), () => false),
+                                  child: Dialog(
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0,
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                            // final user = FirebaseAuth.instance.currentUser; //ALWAYS NULL
-                            Provider.of<AppUser>(context, listen: false)
-                                .fromForm(
-                              email: _email,
-                              password: _password,
-                            ); //SET AppUSER in Provider
-                            bool success1;
-                            try {
-                              success1 = await Provider.of<ServerRequests>(
-                                      context,
-                                      listen: false)
-                                  .login(Provider.of<AppUser>(context,
-                                      listen:
-                                          false)); //Profile will be complete always phir bhi check once
-                            } on PlatformException catch (exp) {
-                              //TODO SHOW ERROR
-                              print(exp.code);
-                            }
-                            if (success1) {
-                              Navigator.pop(context);
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomePage(),
-                                ),
-                                (_) => false,
                               );
+                              // final user = FirebaseAuth.instance.currentUser; //ALWAYS NULL
+                              Provider.of<AppUser>(context, listen: false)
+                                  .fromForm(
+                                email: _email,
+                                password: _password,
+                              ); //SET AppUSER in Provider
+                              bool success1;
+                              try {
+                                success1 = await Provider.of<ServerRequests>(
+                                        context,
+                                        listen: false)
+                                    .login(Provider.of<AppUser>(context,
+                                        listen:
+                                            false)); //Profile will be complete always phir bhi check once
+                              } on PlatformException catch (exp) {
+                                //TODO SHOW ERROR
+                                print(exp.code);
+                              }
+                              if (success1) {
+                                Navigator.pop(context);
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomePage(),
+                                  ),
+                                  (_) => false,
+                                );
+                              }
                             }
-                          }
+                          } else
+                            setState(() {
+                              eText = !(_email == null);
+                              pText = !(_password == null);
+                            });
                         },
                         child: Container(
                           alignment: Alignment.center,

@@ -19,7 +19,7 @@ class Registeruser extends StatefulWidget {
 class _RegisteruserState extends State<Registeruser> {
   String _email, _password, _name;
   TextEditingController _emailController, _nameController, _passwordController;
-  bool eText = true, pText = true;
+  bool eText = true, pText = true, nText = true;
 
   @override
   void initState() {
@@ -77,25 +77,27 @@ class _RegisteruserState extends State<Registeruser> {
                             left: 35 / 3.6 * boxSizeH,
                           ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffCBCBCB)),
                             color: Color(0xffF8F8F8),
                           ),
                           child: TextField(
                             controller: _nameController,
                             keyboardType: TextInputType.emailAddress,
                             style: TextStyle(
-                              fontSize: 3.8 * boxSizeV,
+                              fontSize: 18,
                             ),
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)),
                               hintText: 'Full Name',
-                              hintStyle: TextStyle(fontSize: 22),
+                              errorText: !nText ? 'Enter Name' : null,
+                              hintStyle: TextStyle(fontSize: 18),
                               focusColor: Colors.blue[800],
                             ),
                             onChanged: (value) {
-                              _name = value;
+                              setState(() {
+                                _name = value;
+                                nText = !(_name == null);
+                              });
                             },
                           ),
                         ),
@@ -107,25 +109,36 @@ class _RegisteruserState extends State<Registeruser> {
                             left: 35 / 3.6 * boxSizeH,
                           ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffCBCBCB)),
                             color: Color(0xffF8F8F8),
                           ),
                           child: TextField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
                             style: TextStyle(
-                              fontSize: 3.8 * boxSizeV,
+                              fontSize: 18,
                             ),
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)),
                               hintText: 'Email',
-                              hintStyle: TextStyle(fontSize: 22),
+                              errorText: eText
+                                  ? _email != null
+                                      ? _email.contains('@thapar.edu') &&
+                                              _email.substring(
+                                                      _email.indexOf('@')) ==
+                                                  '@thapar.edu'
+                                          ? null
+                                          : 'Please enter Thapar Id'
+                                      : null
+                                  : 'Enter the email',
+                              hintStyle: TextStyle(fontSize: 18),
                               focusColor: Colors.blue[800],
                             ),
                             onChanged: (value) {
-                              _email = value;
+                              setState(() {
+                                _email = value;
+                                eText = !(_email == null || _email == '');
+                              });
                             },
                           ),
                         ),
@@ -137,14 +150,13 @@ class _RegisteruserState extends State<Registeruser> {
                             left: 35 / 3.6 * boxSizeH,
                           ),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xffCBCBCB)),
                             color: Color(0xffF8F8F8),
                           ),
                           child: TextField(
+                            obscureText: true,
                             controller: _passwordController,
                             style: TextStyle(
-                              fontSize: 3.8 * boxSizeV,
+                              fontSize: 18,
                             ),
                             decoration: InputDecoration(
                               suffixIcon: Icon(
@@ -154,68 +166,94 @@ class _RegisteruserState extends State<Registeruser> {
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10)),
                               hintText: 'Password',
-                              hintStyle: TextStyle(fontSize: 22),
+                              errorText: pText
+                                  ? _password != null
+                                      ? _password.length < 6
+                                          ? 'Password must have atleast 6 characters'
+                                          : null
+                                      : null
+                                  : 'Enter the password',
+                              hintStyle: TextStyle(fontSize: 18),
                               focusColor: Colors.blue[800],
                             ),
                             onChanged: (value) {
-                              _password = value;
+                              setState(() {
+                                _password = value;
+                                pText = !(_password == null || _password == '');
+                              });
                             },
                           ),
                         ),
                         GestureDetector(
                           onTap: () async {
-                            if (true) //TODO : CONDITION FOR CHECK FIELDS
+                            if (_password != null &&
+                                _name != null &&
+                                _email !=
+                                    null) //TODO : CONDITION FOR CHECK FIELDS
                             {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (context) => WillPopScope(
-                                  onWillPop: () =>
-                                      Future.delayed(Duration(), () => false),
-                                  child: Dialog(
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                    child: Center(
-                                      child: CircularProgressIndicator(),
+                              if (_email.contains('@thapar.edu') &&
+                                  _email.substring(_email.indexOf('@')) ==
+                                      '@thapar.edu') {
+                                showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) => WillPopScope(
+                                    onWillPop: () =>
+                                        Future.delayed(Duration(), () => false),
+                                    child: Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                              Provider.of<AppUser>(context, listen: false)
-                                  .fromForm(
-                                name: _name,
-                                email: _email,
-                                password: _password,
-                              ); //SET AppUSER in Provider
-                              bool success;
-                              try {
-                                success = await Provider.of<ServerRequests>(
-                                        context,
-                                        listen: false)
-                                    .registerForm(Provider.of<AppUser>(context,
-                                        listen:
-                                            false)); //SEND EMAIL OTP FROM SERVER
-                              } on PlatformException catch (exp) {
-                                //TODO SHOW ERROR
-                                print(exp.code);
-                                success = false;
-                              }
-                              Navigator.pop(context);
-                              if (success) {
-                                //FIREBASE REGISTER
-                                await Provider.of<Auth>(context, listen: false)
-                                    .formAuth(
-                                        email: _email,
-                                        password:
-                                            _password); //This Will never throw error
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => OTP2(),
-                                  ),
-                                  (_) => false,
                                 );
+                                Provider.of<AppUser>(context, listen: false)
+                                    .fromForm(
+                                  name: _name,
+                                  email: _email,
+                                  password: _password,
+                                ); //SET AppUSER in Provider
+                                bool success;
+                                try {
+                                  success = await Provider.of<ServerRequests>(
+                                          context,
+                                          listen: false)
+                                      .registerForm(Provider.of<AppUser>(
+                                          context,
+                                          listen:
+                                              false)); //SEND EMAIL OTP FROM SERVER
+                                } on PlatformException catch (exp) {
+                                  //TODO SHOW ERROR
+                                  print(exp.code);
+                                  success = false;
+                                }
+                                Navigator.pop(context);
+                                if (success) {
+                                  //FIREBASE REGISTER
+                                  await Provider.of<Auth>(context,
+                                          listen: false)
+                                      .formAuth(
+                                          email: _email,
+                                          password:
+                                              _password); //This Will never throw error
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OTP2(),
+                                    ),
+                                    (_) => false,
+                                  );
+                                }
                               }
+                            } else {
+                              setState(() {
+                                eText = !(_email == null);
+                                pText = !(_password == null);
+
+                                nText = !(_name == null);
+                              });
                             }
                           },
                           child: Container(
