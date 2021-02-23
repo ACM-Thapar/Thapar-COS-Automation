@@ -114,6 +114,7 @@ module.exports.post_login = async (req, res) => {
   //to check if the user already exists
   try {
     console.log('reached');
+
     let shopkeeper = await Shopkeeper.findOne({ email: email });
     console.log(shopkeeper);
     if (!shopkeeper) {
