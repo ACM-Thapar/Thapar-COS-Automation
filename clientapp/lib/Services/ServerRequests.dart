@@ -19,6 +19,7 @@ class ServerRequests {
         'name': appUser.name,
         'email': appUser.email,
         'password': appUser.password,
+        'photo': appUser.pic
       }),
     );
     if (res.statusCode == 200) {
@@ -29,7 +30,9 @@ class ServerRequests {
       print(res.statusCode);
       print(res.body);
       throw PlatformException(
-          code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
+          code: 'Email already in use',
+          message: 'There is already a user with this email',
+          details: 'single'); //TODO : CHECK ERRORS FROM SERVER
     }
   }
 
@@ -67,9 +70,11 @@ class ServerRequests {
       return true;
     } else {
       print(res.statusCode);
-      print(res.body);
+      print(jsonDecode(res.body));
       throw PlatformException(
-          code: 'Error from server'); //TODO : IMPLEMENT ERRORS FROM SERVER
+          code: 'Email already in use',
+          message: 'There is already a user with this email',
+          details: 'single'); //TODO : CHECK ERRORS FROM SERVER
     }
   }
 
@@ -178,17 +183,26 @@ class ServerRequests {
     } else {
       print(res.statusCode);
       print(res.body);
-      /*
-    {
-        "errors": [
-            {
-                "msg": "OTP has expired" /"invalid OTP"
-            }
-        ]
-    }
-    */
-      throw PlatformException(
-          code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
+      switch (res.statusCode) {
+        case 400:
+          throw PlatformException(
+              code: 'OTP Expired',
+              message: 'Click the resend OTP button for new OTP',
+              details: 'single');
+          break;
+        case 401:
+          throw PlatformException(
+              code: 'Invalid OTP',
+              message: 'Please check the entered OTP',
+              details: 'single');
+          break;
+        default:
+          throw PlatformException(
+              code: 'Something went wrong',
+              message: 'Please try again after some time',
+              details: 'single');
+      }
+      //TODO :CHECK ERRORS FROM SERVER
     }
   }
 
@@ -226,6 +240,11 @@ class ServerRequests {
 
   Future<bool> updateProfile(AppUser appUser) async {
     print('Update Profile SENT');
+    print(jsonEncode(<String, String>{
+      'phone': appUser.phone,
+      if (store.getBool('userType')) 'hostel': appUser.hostel,
+      'name': appUser.name,
+    }));
     http.Response res = await http.put(
       '$_url/${store.getBool('userType') ? 'user' : 'auth'}/complete-profile',
       headers: <String, String>{
@@ -235,6 +254,7 @@ class ServerRequests {
       body: jsonEncode(<String, String>{
         'phone': appUser.phone,
         if (store.getBool('userType')) 'hostel': appUser.hostel,
+        'name': appUser.name,
       }),
     );
     if (res.statusCode == 200) {
@@ -264,15 +284,12 @@ class ServerRequests {
     } else {
       print(res.statusCode);
       print(res.body);
-      /*
-    {
-        "success": false,
-        "message": "Not authorized to access this route"
+      throw PlatformException(
+          code: 'Error From SERVER',
+          message:
+              'Please try again and if this happens again try restarting the app.',
+          details: 'single'); //CHECK ERRORS FROM SERVER
     }
-    */
-    }
-    throw PlatformException(
-        code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
   }
 
   Future<bool> login(AppUser appUser) async {
@@ -296,12 +313,54 @@ class ServerRequests {
     }
     */
       await store.setString('token', jsonDecode(res.body)['token']);
-      return jsonDecode(res.body)['profileCompletion'];
+      return true;
     } else {
       print(res.statusCode);
       print(res.body);
-      throw PlatformException(
-          code: 'Error From SERVER'); //TODO : IMPLEMENT ERRORS FROM SERVER
+      if (res.statusCode == 400)
+        throw PlatformException(
+            code: 'Invalid Credentials',
+            message:
+                'Wrong email or password.Sign in again with correct email and password',
+            details: 'single');
+      else
+        throw PlatformException(
+            code: 'Error From SERVER',
+            message: 'Something went wrong. Please try again later.',
+            details: 'single'); //CHECK ERRORS FROM SERVER
+    }
+  }
+
+  Future<List<dynamic>> getShops(String token) async {
+    print('GET SHOPS SENT');
+    http.Response res = await http.get(
+      '$_url/shop/getAllShops',
+      headers: <String, String>{'authorization': 'Bearer $token}'},
+    );
+    if (res.statusCode == 200) {
+      /*
+    {
+        "success": true,
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwMzAyOTJlNzliOTFhMDAxNTlmMjRlMyIsImlhdCI6MTYxMzc2OTAxNH0.fKX7M3rJp4oYKDxV3WelPGEpGq8dzizp4EYXMNL6WWE",
+        "profileCompletion": false
+    }
+    */
+      print(res.body);
+      return jsonDecode(res.body)['data'];
+    } else {
+      print(res.statusCode);
+      print(res.body);
+      if (res.statusCode == 400)
+        throw PlatformException(
+            code: 'Invalid Credentials',
+            message:
+                'Wrong email or password.Sign in again with correct email and password',
+            details: 'single');
+      else
+        throw PlatformException(
+            code: 'Error From SERVER',
+            message: 'Something went wrong. Please try again later.',
+            details: 'single'); //TODO SET ERRORS FROM SERVER
     }
   }
 }

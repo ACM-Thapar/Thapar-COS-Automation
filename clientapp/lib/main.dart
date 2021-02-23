@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import './Services/auth.dart';
@@ -24,6 +25,10 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return MultiProvider(
       providers: [
         Provider<ServerRequests>(
@@ -38,6 +43,10 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<ServerRequests>(
         builder: (context, serverRequests, child) => MaterialApp(
+          theme: ThemeData(
+              primaryColor: Color(0xffFFCB00),
+              cursorColor: Color(0xffFFCB00),
+              accentColor: Color(0xffFFCB00)),
           title: 'Flutter Demo',
           home: Consumer<AppUser>(
               builder: (context, appUser, child) => SplashScreen(

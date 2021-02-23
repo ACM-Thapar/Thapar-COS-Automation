@@ -3,19 +3,19 @@ import 'dart:convert';
 
 import 'package:clientapp/Screens/HomePage.dart';
 import 'package:clientapp/Screens/OTP_Verification/OTP-2.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../Screens/UserType.dart';
 import '../Services/User.dart';
-import './Intro/Intro1.dart';
 import './OTP_Verification/OTP-1.dart';
 import '../Services/ServerRequests.dart';
 import '../Variables.dart';
 import '../WidgetResizing.dart';
 import './ShopProfile.dart';
+import '../ErrorBox.dart';
+import './Builder.dart';
+import '../Services/Shop.dart';
 
 class SplashScreen extends StatefulWidget {
   final ServerRequests serverRequests;
@@ -31,18 +31,18 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void changeScreen() async {
-    final User user = FirebaseAuth.instance.currentUser;
     final String token = store.getString('token');
     final bool userType = store.getBool('userType');
-    print('TOKEN : $token  :FUSER: $user ::TYPE $userType');
+    print('TOKEN : $token : TYPE $userType');
     if (token != null) {
-      //USER SIGNED IN FIREBASE AND SERVER -> Gsign OR Email & Pass SignUp
+      //USER SIGNED IN SERVER
       String json;
       try {
         json = await widget.serverRequests.getUser(token, userType);
       } on PlatformException catch (e) {
         print(e.code);
-        //TODO: SERVER DOWN CLOSE APP
+        //TODO:SERVER DOWN CLOSE APP
+        await errorBox(context, e);
       }
       if (json != null) {
         widget.appUser.fromServer(json); //SETTING THE AppUSER IN PROVIDER
@@ -58,6 +58,8 @@ class _SplashScreenState extends State<SplashScreen> {
             print(e.code);
             //TODO ASK WHAT AGAIN SIGN OR what
             //CRASH APP ERROR
+            await errorBox(context, e);
+            success = false;
           }
           if (success) {
             Navigator.pushReplacement(
@@ -68,49 +70,56 @@ class _SplashScreenState extends State<SplashScreen> {
             );
           }
         } else if (jsonObj['data']['verified'] == true &&
-            jsonObj['data']['phone'] == null &&
-            jsonObj['data']['hostel'] == null) {
-          //GsignUp OR (Email & Pass)
+            jsonObj['data']['phone'] == null) {
           //Email verified
           //PHONE AND HOSTEL LEFT
-          if (user.phoneNumber == null) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => OTP1(),
-              ),
-            );
-          } else {
-            widget.appUser.setPhone(user.phoneNumber);
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) => Intro1(),
-              ),
-            );
-          }
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => OTP1(),
+            ),
+          );
+        } else if (jsonObj['data']['verified'] == true &&
+            jsonObj['data']['phone'] != null &&
+            jsonObj['data']['hostel'] == null &&
+            store.getBool('userType')) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  ProfileBuilder(appUser: widget.appUser),
+            ),
+          );
         } else {
           //FULL USER PROFILE COMPLETE
           //SHOPKEEPER CHECK
-          List<dynamic> shops = jsonObj['data']['shops'];
-          if (store.getBool('userType') == false && shops.isEmpty) {
+          List<dynamic> shopkeeperShops = jsonObj['data']['shops'];
+          if (store.getBool('userType') == false && shopkeeperShops.isEmpty) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) => ShopProfile(),
               ),
             );
-          } else
+          } else {
+            //GET ALL SHOPS
+            final List<dynamic> list =
+                await widget.serverRequests.getShops(store.getString('token'));
+            list.forEach((element) {
+              Shop.fromjson(element);
+              shops.add(Shop.fromjson(element));
+            });
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) => HomePage(),
               ),
             );
+          }
         }
       }
     } else {
-      //User has no account
+      //User has no account/Logged out
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -145,10 +154,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Center(
                 child: Text(
                   'COSMOS',
-                  style: GoogleFonts.josefinSans(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      fontSize: 26),
+                  style: josefinSansR20.copyWith(color: Colors.white),
                 ),
               ),
               Positioned(
@@ -160,15 +166,12 @@ class _SplashScreenState extends State<SplashScreen> {
                         textAlign: TextAlign.center,
                         text: TextSpan(
                             text: 'from\n',
-                            style: GoogleFonts.josefinSans(
-                                color: Colors.white, fontSize: 19),
+                            style: josefinSansR14.copyWith(color: Colors.white),
                             children: [
                               TextSpan(
                                 text: 'ACM THAPAR',
-                                style: GoogleFonts.josefinSans(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                    fontSize: 23),
+                                style: josefinSansSB18.copyWith(
+                                    color: Colors.white),
                               ),
                             ]),
                       ),

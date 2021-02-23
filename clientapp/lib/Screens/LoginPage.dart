@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:clientapp/ErrorBox.dart';
 import 'package:clientapp/Services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../Services/User.dart';
@@ -9,6 +13,10 @@ import '../Services/ServerRequests.dart';
 import '../Variables.dart';
 import './Registeruserpage.dart';
 import './HomePage.dart';
+import 'Builder.dart';
+import 'OTP_Verification/OTP-1.dart';
+import 'OTP_Verification/OTP-2.dart';
+import 'ShopProfile.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -16,12 +24,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  FocusNode _emailFocus, _passFocus, _escapeNode;
   String _email, _password;
   TextEditingController _emailController, _passwordController;
-  bool eText = true, pText = true;
+  bool eText = true, pText = true, hidePass = true;
 
   @override
   void initState() {
+    _emailFocus = FocusNode();
+    _escapeNode = FocusNode();
+    _passFocus = FocusNode();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     super.initState();
@@ -31,10 +43,12 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
+        //BAck to USERTYPE
         return Future.delayed(Duration(), () => true);
       },
       child: SafeArea(
         child: Scaffold(
+          backgroundColor: Colors.white,
           body: SingleChildScrollView(
             child: Stack(
               children: [
@@ -49,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Container(
+                  color: Colors.transparent,
                   height: 100 * boxSizeV,
                   width: 100 * boxSizeH,
                   child: Column(
@@ -61,76 +76,120 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: Text(
                           'Welcome!',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 45,
-                          ),
+                          style: robotoB45.copyWith(color: Colors.black),
                         ),
                       ),
                       Container(
-                        height: 58 / 6.4 * boxSizeV,
                         width: 291 / 3.6 * boxSizeH,
                         margin: EdgeInsets.only(
                           top: 32 / 6.4 * boxSizeV,
                           left: 35 / 3.6 * boxSizeH,
                         ),
-                        decoration: BoxDecoration(
-                          color: Color(0xffF8F8F8),
-                        ),
                         child: TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            hintText: 'Email',
-                            errorText: eText
-                                ? _email != null
-                                    ? _email.contains('@thapar.edu') &&
-                                            _email.substring(
-                                                    _email.indexOf('@')) ==
-                                                '@thapar.edu'
-                                        ? null
-                                        : 'Please enter Thapar Id'
-                                    : null
-                                : 'Enter the email',
-                            hintStyle: TextStyle(fontSize: 22),
-                            focusColor: Colors.blue[800],
-                          ),
+                          focusNode: _emailFocus,
+                          textInputAction: TextInputAction.next,
                           onChanged: (value) {
                             setState(() {
                               _email = value;
                               eText = !(_email == null || _email == '');
                             });
                           },
+                          onSubmitted: (v) {
+                            print(v);
+                            FocusScope.of(context).requestFocus(_passFocus);
+                          },
+                          style: openSansR14.copyWith(color: Colors.black),
+                          cursorColor: Color(0xffFFCB00),
+                          decoration: InputDecoration(
+                            hintText: 'Email',
+                            errorText: eText
+                                ? _email != null
+                                    ? store.getBool('userType')
+                                        ? RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@thapar\.edu$")
+                                                .hasMatch(_email)
+                                            ? null
+                                            : 'Please enter valid Thapar email'
+                                        : RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                                .hasMatch(_email)
+                                            ? null
+                                            : 'Please enter valid email'
+                                    : null
+                                : 'Enter the email',
+                            fillColor: Color(0x80F8F8F8),
+                            filled: true,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 0.5,
+                                color: Color(0xffCBCBCB),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Color(0xffFFCB00),
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Colors.red,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Colors.red,
+                              ),
+                            ),
+                            hintStyle:
+                                openSansL14.copyWith(color: Color(0xAB707070)),
+                          ),
                         ),
                       ),
                       Container(
-                        height: 58 / 6.4 * boxSizeV,
                         width: 291 / 3.6 * boxSizeH,
                         margin: EdgeInsets.only(
                           top: 20 / 6.4 * boxSizeV,
                           left: 35 / 3.6 * boxSizeH,
                         ),
-                        decoration: BoxDecoration(
-                          color: Color(0xffF8F8F8),
-                        ),
                         child: TextField(
-                          obscureText: true,
+                          obscureText: hidePass,
                           controller: _passwordController,
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
+                          keyboardType: TextInputType.visiblePassword,
+                          focusNode: _passFocus,
+                          textInputAction: TextInputAction.done,
+                          onChanged: (value) {
+                            setState(() {
+                              _password = value;
+                              pText = !(_password == null || _password == '');
+                            });
+                          },
+                          onSubmitted: (v) {
+                            print(v);
+                            FocusScope.of(context).requestFocus(_escapeNode);
+                          },
+                          style: openSansR14.copyWith(color: Colors.black),
+                          cursorColor: Color(0xffFFCB00),
                           decoration: InputDecoration(
-                            suffixIcon: Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.black,
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  hidePass = !hidePass;
+                                });
+                              },
+                              child: Icon(
+                                hidePass
+                                    ? Icons.remove_red_eye
+                                    : Icons.remove_red_eye_outlined,
+                                color: Colors.black,
+                              ),
                             ),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)),
                             hintText: 'Password',
                             errorText: pText
                                 ? _password != null
@@ -139,17 +198,43 @@ class _LoginPageState extends State<LoginPage> {
                                         : null
                                     : null
                                 : 'Enter the password',
-                            hintStyle: TextStyle(fontSize: 18),
-                            focusColor: Colors.blue[800],
+                            fillColor: Color(0x80F8F8F8),
+                            filled: true,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 0.5,
+                                color: Color(0xffCBCBCB),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Color(0xffFFCB00),
+                              ),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Colors.red,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                width: 2,
+                                color: Colors.red,
+                              ),
+                            ),
+                            hintStyle: openSansL14.copyWith(
+                              color: Color(0xAB707070),
+                            ),
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              _password = value;
-                              pText = !(_password == null || _password == '');
-                            });
-                          },
                         ),
                       ),
+                      //TODO IMPLEMENT FORGOT PASSWORD
                       Container(
                         margin: EdgeInsets.only(
                           top: 13 / 6.4 * boxSizeV,
@@ -157,17 +242,23 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: Text(
                           'Forget Password!',
-                          style: TextStyle(
-                            color: Color(0xffFFCB00),
-                          ),
+                          style: josefinSansSB14.copyWith(
+                              color: Color(0xffFFCB00)),
                         ),
                       ),
                       GestureDetector(
                         onTap: () async {
-                          if (_email != null && _password != null) {
-                            if (_email.contains('@thapar.edu') &&
-                                _email.substring(_email.indexOf('@')) ==
-                                    '@thapar.edu') {
+                          if (_email != null &&
+                              _password != null) //CONDITION FOR CHECK FIELDS
+                          {
+                            if ((store.getBool('userType')
+                                    ? RegExp(
+                                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@thapar\.edu$")
+                                        .hasMatch(_email)
+                                    : RegExp(
+                                            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                        .hasMatch(_email)) &&
+                                _password.length > 5) {
                               showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -183,7 +274,6 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               );
-                              // final user = FirebaseAuth.instance.currentUser; //ALWAYS NULL
                               Provider.of<AppUser>(context, listen: false)
                                   .fromForm(
                                 email: _email,
@@ -195,27 +285,114 @@ class _LoginPageState extends State<LoginPage> {
                                         context,
                                         listen: false)
                                     .login(Provider.of<AppUser>(context,
-                                        listen:
-                                            false)); //Profile will be complete always phir bhi check once
+                                        listen: false));
                               } on PlatformException catch (exp) {
-                                //TODO SHOW ERROR
-                                print(exp.code);
+                                Navigator.pop(context);
+                                //SHOW ERROR
+                                await errorBox(context, exp);
+                                success1 = false;
                               }
                               if (success1) {
-                                Navigator.pop(context);
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HomePage(),
-                                  ),
-                                  (_) => false,
-                                );
+                                String json;
+                                try {
+                                  json = await Provider.of<ServerRequests>(
+                                          context,
+                                          listen: false)
+                                      .getUser(store.getString('token'),
+                                          store.getBool('userType'));
+                                } on PlatformException catch (e) {
+                                  print(e.code);
+                                  //TODO:SERVER DOWN CLOSE APP
+                                  await errorBox(context, e);
+                                }
+                                if (json != null) {
+                                  Provider.of<AppUser>(context, listen: false)
+                                      .fromServer(
+                                          json); //SETTING THE AppUSER IN PROVIDER
+                                  //check profile complete or not
+                                  final jsonObj = jsonDecode(json);
+                                  if (jsonObj['data']['verified'] == false) {
+                                    //Email & Pass SignUp
+                                    //EMAIL LEFT ->Phone and hostel left
+                                    bool success;
+                                    try {
+                                      success =
+                                          await Provider.of<ServerRequests>(
+                                                  context,
+                                                  listen: false)
+                                              .regenerateOtp();
+                                    } on PlatformException catch (e) {
+                                      print(e.code);
+                                      //TODO ASK WHAT AGAIN SIGN OR what
+                                      //CRASH APP ERROR
+                                      await errorBox(context, e);
+                                      success = false;
+                                    }
+                                    if (success) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              OTP2(),
+                                        ),
+                                      );
+                                    }
+                                  } else if (jsonObj['data']['verified'] ==
+                                          true &&
+                                      jsonObj['data']['phone'] == null) {
+                                    //Email verified
+                                    //PHONE AND HOSTEL LEFT
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            OTP1(),
+                                      ),
+                                    );
+                                  } else if (jsonObj['data']['verified'] ==
+                                          true &&
+                                      jsonObj['data']['phone'] != null &&
+                                      jsonObj['data']['hostel'] == null) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            ProfileBuilder(
+                                                appUser: Provider.of<AppUser>(
+                                                    context,
+                                                    listen: false)),
+                                      ),
+                                    );
+                                  } else {
+                                    //FULL USER PROFILE COMPLETE
+                                    //SHOPKEEPER CHECK
+                                    List<dynamic> shops =
+                                        jsonObj['data']['shops'];
+                                    if (store.getBool('userType') == false &&
+                                        shops.isEmpty) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              ShopProfile(),
+                                        ),
+                                      );
+                                    } else
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              HomePage(),
+                                        ),
+                                      );
+                                  }
+                                }
                               }
                             }
                           } else
                             setState(() {
-                              eText = !(_email == null);
-                              pText = !(_password == null);
+                              eText = !(_email == null || _email == '');
+                              pText = !(_password == null || _password == '');
                             });
                         },
                         child: Container(
@@ -233,7 +410,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: Text(
                             'Log In',
-                            style: TextStyle(color: Colors.white, fontSize: 21),
+                            style: josefinSansR18.copyWith(color: Colors.white),
                           ),
                         ),
                       ),
@@ -246,10 +423,8 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               Text(
                                 'Not a member ?  ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
+                                style: josefinSansSB14.copyWith(
+                                    color: Colors.black),
                               ),
                               GestureDetector(
                                 onTap: () async {
@@ -262,11 +437,8 @@ class _LoginPageState extends State<LoginPage> {
                                 },
                                 child: Text(
                                   'Join now',
-                                  style: TextStyle(
-                                    color: Color(0xffFFCB00),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
+                                  style: josefinSansSB14.copyWith(
+                                      color: Color(0xffFFCB00)),
                                 ),
                               )
                             ],
@@ -281,18 +453,19 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(
                                 child: Divider(
                                   thickness: 1,
-                                  color: Colors.black,
+                                  color: Color(0x80707070),
                                 ),
                                 width: 93 / 3.6 * boxSizeH,
                               ),
                               Text(
                                 ' Or sign in with ',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: josefinSansSB14.copyWith(
+                                    color: Colors.black),
                               ),
                               SizedBox(
                                 child: Divider(
                                   thickness: 1,
-                                  color: Colors.black,
+                                  color: Color(0x80707070),
                                 ),
                                 width: 93 / 3.6 * boxSizeH,
                               ),
@@ -322,11 +495,10 @@ class _LoginPageState extends State<LoginPage> {
                                       listen: false)
                                   .googleAuth();
                             } on PlatformException catch (pltError) {
-                              //TODO: SHOW ERROR
-                              print(pltError.code);
-                            } catch (e) {
-                              //OTHER ERROR
-                              print(e);
+                              Navigator.pop(
+                                  context); //Remove Circular Indicator
+                              //SHOW ERROR
+                              await errorBox(context, pltError);
                             }
                             if (_userCredential != null) {
                               Provider.of<AppUser>(context, listen: false)
@@ -338,23 +510,110 @@ class _LoginPageState extends State<LoginPage> {
                                         context,
                                         listen: false)
                                     .login(Provider.of<AppUser>(context,
-                                        listen:
-                                            false)); //Profile will be complete always phir bhi check once
+                                        listen: false));
                               } on PlatformException catch (exp) {
-                                //TODO SHOW ERROR
-                                print(exp.code);
+                                Navigator.pop(context);
+                                //SHOW ERROR
+                                await errorBox(context, exp);
+                                //DELETE FIRBASE USER CREATED
+                                FirebaseAuth.instance.currentUser.delete();
                                 success1 = false;
-                                Navigator.of(context).pop();
                               }
                               if (success1) {
-                                Navigator.pop(context);
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HomePage(),
-                                  ),
-                                  (_) => false,
-                                );
+                                String json;
+                                try {
+                                  json = await Provider.of<ServerRequests>(
+                                          context,
+                                          listen: false)
+                                      .getUser(store.getString('token'),
+                                          store.getBool('userType'));
+                                } on PlatformException catch (e) {
+                                  print(e.code);
+                                  //TODO:SERVER DOWN CLOSE APP
+                                  await errorBox(context, e);
+                                }
+                                if (json != null) {
+                                  Provider.of<AppUser>(context, listen: false)
+                                      .fromServer(
+                                          json); //SETTING THE AppUSER IN PROVIDER
+                                  //check profile complete or not
+                                  final jsonObj = jsonDecode(json);
+                                  if (jsonObj['data']['verified'] == false) {
+                                    //Email & Pass SignUp
+                                    //EMAIL LEFT ->Phone and hostel left
+                                    bool success;
+                                    try {
+                                      success =
+                                          await Provider.of<ServerRequests>(
+                                                  context,
+                                                  listen: false)
+                                              .regenerateOtp();
+                                    } on PlatformException catch (e) {
+                                      print(e.code);
+                                      //TODO ASK WHAT AGAIN SIGN OR what
+                                      //CRASH APP ERROR
+                                      await errorBox(context, e);
+                                      success = false;
+                                    }
+                                    if (success) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              OTP2(),
+                                        ),
+                                      );
+                                    }
+                                  } else if (jsonObj['data']['verified'] ==
+                                          true &&
+                                      jsonObj['data']['phone'] == null) {
+                                    //Email verified
+                                    //PHONE AND HOSTEL LEFT
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            OTP1(),
+                                      ),
+                                    );
+                                  } else if (jsonObj['data']['verified'] ==
+                                          true &&
+                                      jsonObj['data']['phone'] != null &&
+                                      jsonObj['data']['hostel'] == null) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            ProfileBuilder(
+                                                appUser: Provider.of<AppUser>(
+                                                    context,
+                                                    listen: false)),
+                                      ),
+                                    );
+                                  } else {
+                                    //FULL USER PROFILE COMPLETE
+                                    //SHOPKEEPER CHECK
+                                    List<dynamic> shops =
+                                        jsonObj['data']['shops'];
+                                    if (store.getBool('userType') == false &&
+                                        shops.isEmpty) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              ShopProfile(),
+                                        ),
+                                      );
+                                    } else
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              HomePage(),
+                                        ),
+                                      );
+                                  }
+                                }
                               }
                             }
                           },
@@ -362,8 +621,10 @@ class _LoginPageState extends State<LoginPage> {
                             alignment: Alignment.center,
                             height: 38 / 6.4 * boxSizeV,
                             // width: 132 / 3.6 * boxSizeH,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 40 / 3.6 * boxSizeH),
+                            padding: EdgeInsets.only(
+                              left: 50 / 3.6 * boxSizeH,
+                              right: 60 / 3.6 * boxSizeH,
+                            ),
                             margin: EdgeInsets.only(
                               top: 20 / 6.4 * boxSizeV,
                               left: 80 / 3.6 * boxSizeH,
@@ -374,10 +635,21 @@ class _LoginPageState extends State<LoginPage> {
                               border: Border.all(color: Color(0xffCBCBCB)),
                               color: Colors.white,
                             ),
-                            child: Text(
-                              'Google',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                // Icon(FontAwesomeIcons.google),
+                                SvgPicture.asset(
+                                  'assets/google.svg',
+                                  height: 18 * boxSizeV / 6.4,
+                                  width: 18 * boxSizeH / 3.6,
+                                ),
+                                Text(
+                                  'Google',
+                                  style: josefinSansR10.copyWith(
+                                      color: Colors.black),
+                                ),
+                              ],
                             ),
                           ),
                         ),
