@@ -1,3 +1,4 @@
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:clientapp/Screens/Intro/Intro1.dart';
 import 'package:clientapp/Services/User.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +10,11 @@ import 'package:flutter/services.dart';
 
 import '../../Variables.dart';
 import '../../WidgetResizing.dart';
+import '../../ErrorBox.dart';
+import '../UserType.dart';
+import '../../Services/ServerRequests.dart';
+
+// TODO : CHECK FOR THE SMS VERIFICATION UPDATE AS IT IS NOT YET IMPLEMENTED CAN ONLY GIVE AUTO VERIFICATION
 
 class OTP1 extends StatefulWidget {
   @override
@@ -16,6 +22,7 @@ class OTP1 extends StatefulWidget {
 }
 
 class _OTP1State extends State<OTP1> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   // bool sms = false;
   // String _verificationId, _smsCode;
   PhoneNumber phone;
@@ -32,13 +39,12 @@ class _OTP1State extends State<OTP1> {
               textAlign: TextAlign.center,
               text: TextSpan(
                 text: 'We will send you a ',
-                style: GoogleFonts.josefinSans(
-                    fontSize: 22, color: Colors.black54),
+                style: josefinSansSB14.copyWith(color: Color(0xff707070)),
                 children: [
                   TextSpan(
-                      text: 'One Time Password',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black)),
+                    text: 'One Time Password',
+                    style: josefinSansSB14.copyWith(color: Colors.black),
+                  ),
                   TextSpan(text: ' on this mobile number'),
                 ],
               ),
@@ -48,11 +54,12 @@ class _OTP1State extends State<OTP1> {
             height: 34 * boxSizeV / 6.4,
           ),
           Container(
-            child: Text('Enter Mobile Number',
-                style: GoogleFonts.josefinSans(
-                    fontSize: 22,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold)),
+            child: Text(
+              'Enter Mobile Number',
+              style: josefinSansSB14.copyWith(
+                color: Colors.black,
+              ),
+            ),
           ),
           SizedBox(height: 19 * boxSizeV / 6.4),
           Container(
@@ -61,38 +68,32 @@ class _OTP1State extends State<OTP1> {
             child: InternationalPhoneNumberInput(
               textFieldController: phoneController,
               autoValidate: true,
-              selectorTextStyle: GoogleFonts.josefinSans(
-                  fontSize: 24,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold),
+              selectorTextStyle: josefinSansSB20.copyWith(
+                color: Colors.black,
+              ),
               autoFocus: true,
               keyboardAction: TextInputAction.done,
-              textStyle: GoogleFonts.josefinSans(
-                  fontSize: 24,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold),
+              textStyle: josefinSansSB20.copyWith(
+                color: Colors.black,
+              ),
               inputDecoration: InputDecoration(
                   border: UnderlineInputBorder(), hintText: 'Phone Number'),
               onInputChanged: (value) {
                 phone = value;
               },
               onFieldSubmitted: (no) async {
-                if (phone.parseNumber().length == 10) {
-                  showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) => WillPopScope(
-                      onWillPop: () => Future.delayed(Duration(), () => false),
-                      child: Dialog(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                if (phone != null && phone.parseNumber().length == 10) {
+                  await phoneVerify(phone.toString());
+                } else {
+                  _scaffoldKey.currentState.showSnackBar(
+                    SnackBar(
+                      duration: Duration(seconds: 1),
+                      content: Text(
+                        'Enter the correct phone number',
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   );
-                  await phoneVerify(phone.toString());
                 }
               },
               countries: ['IN'],
@@ -101,22 +102,18 @@ class _OTP1State extends State<OTP1> {
           SizedBox(height: 34.5 * boxSizeV / 6.4),
           GestureDetector(
             onTap: () async {
-              if (phone.parseNumber().length == 10) {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) => WillPopScope(
-                    onWillPop: () => Future.delayed(Duration(), () => false),
-                    child: Dialog(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
+              if (phone != null && phone.parseNumber().length == 10) {
+                await phoneVerify(phone.toString());
+              } else {
+                _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(
+                    duration: Duration(seconds: 1),
+                    content: Text(
+                      'Enter the correct phone number',
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 );
-                await phoneVerify(phone.toString());
               }
             },
             child: Container(
@@ -129,95 +126,116 @@ class _OTP1State extends State<OTP1> {
               ),
               child: Text(
                 'Get OTP',
-                style: GoogleFonts.josefinSans(
-                  fontSize: 24,
+                style: josefinSansR18.copyWith(
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
           SizedBox(height: 15 * boxSizeV / 6.4),
-          Container(
-              // padding: EdgeInsets.symmetric(horizontal: 2 * boxSizeH),
-              // decoration: BoxDecoration(border: Border.all()),
-              child: RichText(
-                  maxLines: 2,
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                      text: 'Note:',
-                      style: GoogleFonts.josefinSans(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black),
-                      children: [
-                        TextSpan(
-                            text: ' Make sure this is your mobile\'s ',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black54)),
-                        TextSpan(text: 'SIM-1')
-                      ])))
+          // Container(
+          //     // padding: EdgeInsets.symmetric(horizontal: 2 * boxSizeH),
+          //     // decoration: BoxDecoration(border: Border.all()),
+          //     child: RichText(
+          //         maxLines: 2,
+          //         textAlign: TextAlign.center,
+          //         text: TextSpan(
+          //             text: 'Note:',
+          //             style: GoogleFonts.josefinSans(
+          //                 fontWeight: FontWeight.bold,
+          //                 fontSize: 16,
+          //                 color: Colors.black),
+          //             children: [
+          //               TextSpan(
+          //                   text: ' Make sure this is your mobile\'s ',
+          //                   style: TextStyle(
+          //                       fontSize: 15,
+          //                       fontWeight: FontWeight.normal,
+          //                       color: Colors.black54)),
+          //               TextSpan(text: 'SIM-1')
+          //             ])))
         ],
       );
 
-  Future<bool> _verify({PhoneAuthCredential creds, User currentUser}) async {
-    print('VERIFYING  $creds');
-    final userCreds =
-        await currentUser.linkWithCredential(creds).catchError((error) {
-      print("Failed to verify SMS code: $error");
-      Navigator.of(context).pop();
-    });
-    if (userCreds.user != null &&
-        userCreds.user.phoneNumber != null &&
-        userCreds.user.phoneNumber.isNotEmpty) {
-      print('AFER OTP DONE : ${FirebaseAuth.instance.currentUser.phoneNumber}');
-      FirebaseAuth.instance.currentUser.emailVerified
-          ? Provider.of<AppUser>(context, listen: false)
-              .fromFirebase(userCreds.user)
-          : Provider.of<AppUser>(context, listen: false)
-              .fromForm(phone: FirebaseAuth.instance.currentUser.phoneNumber);
-      return true;
-    } else
-      return false;
-  }
-
   Future<void> phoneVerify(String phone) async {
-    // print('WORKING');
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => WillPopScope(
+        onWillPop: () => Future.delayed(Duration(), () => false),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      ),
+    );
     FirebaseAuth _auth = FirebaseAuth.instance;
-    User currentFUser = _auth.currentUser;
     await _auth.verifyPhoneNumber(
         timeout: Duration(seconds: 40),
         phoneNumber: phone,
-        verificationCompleted: /*LINKING COMPLETES AUTOMATICALLY*/ (PhoneAuthCredential
+        verificationCompleted: /*VERIFICATION COMPLETES AUTOMATICALLY*/ (PhoneAuthCredential
             phoneAuthCredential) async {
-          print(
-              "AUTOMATIC :::  $phoneAuthCredential :::  ${phoneAuthCredential == null}");
-          if (await _verify(
-              creds: phoneAuthCredential, currentUser: currentFUser)) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => Intro1(),
-              ),
-            );
+          if (phoneAuthCredential.token != null) {
+            Provider.of<AppUser>(context, listen: false).setPhone(phone);
+            bool success;
+            try {
+              success = await Provider.of<ServerRequests>(context,
+                      listen: false)
+                  .updateProfile(Provider.of<AppUser>(context, listen: false));
+            } on PlatformException catch (e) {
+              //SHOW ERROR ON UPDATE PROFILE
+              await errorBox(context, e);
+              success = false;
+            }
+            if (success) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => Intro1(),
+                ),
+                (_) => false,
+              );
+            }
           } else {
-            print('COULD NOT VERIFY PHONE TRY AGAIN');
+            Navigator.pop(context); //Remove Circular indicator
+            await errorBox(
+              context,
+              PlatformException(
+                  code: 'Something went wrong',
+                  message: 'Something went wrong. Try again after sometime.',
+                  details: 'single'),
+            );
           }
         },
-        verificationFailed: (FirebaseAuthException authException) {
-          print('ERROR MESSAGE:::${authException.message}');
+        verificationFailed: (FirebaseAuthException authException) async {
+          Navigator.pop(context); //Remove Circular indicator
+          await errorBox(
+            context,
+            PlatformException(
+                code: 'Something went wrong',
+                message: 'Something went wrong. Try again after sometime.',
+                details: 'single'),
+          );
         },
         codeSent: (String verificationId, [int forceResendingToken]) async {
           print('SENT');
           // this._verificationId = verificationId;
           // print(_verificationId);
         },
-        codeAutoRetrievalTimeout: (String verificationId) {
+        codeAutoRetrievalTimeout: (String verificationId) async {
           print('TIMEOUT');
           Navigator.pop(
-              context); //TODO ADD ERROR PHONE AUTH NOT DONE TRY AGAIN AFTERWARDS
-
+              context); //ERROR PHONE AUTH NOT DONE TRY AGAIN AFTERWARDS
+          await errorBox(
+            context,
+            PlatformException(
+                code: 'Error phone not verified',
+                message:
+                    'OTP not recieved in time.Needs strong network.Try again after sometime',
+                details: 'single'),
+          );
           // this._verificationId = verificationId;
           // print(_verificationId);
           // setState(() {
@@ -241,20 +259,39 @@ class _OTP1State extends State<OTP1> {
     return WillPopScope(
       //EXIT APP ERROR
       // print('EXIT APP');
-      onWillPop: () => Future.delayed(
-          Duration(),
-          () =>
-              //  sms
-              //     ? {
-              //         setState(() {
-              //           sms = !sms;
-              //         }),
-              //         false
-              //       }
-              //     :
-              true),
+      onWillPop: () async {
+        bool val = await errorBox(
+          context,
+          PlatformException(
+            code: 'Logout & Exit',
+            message: 'Are you sure you want to logout and exit?',
+            details: 'double',
+          ),
+        );
+        print(val);
+        if (val) {
+          await FirebaseAuth.instance.signOut();
+          store.clear();
+          // exit(0);
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        }
+        return false;
+      },
+      // => Future.delayed(
+      //     Duration(),
+      //     () =>
+      //          sms
+      //             ? {
+      //                 setState(() {
+      //                   sms = !sms;
+      //                 }),
+      //                 false
+      //               }
+      //             :
+      //         true),
       child: SafeArea(
         child: Scaffold(
+          key: _scaffoldKey,
           body: Container(
             height: 100 * boxSizeV,
             width: 100 * boxSizeH,
@@ -267,18 +304,37 @@ class _OTP1State extends State<OTP1> {
                   Container(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
-                        onTap: () {
-                          //CODE FOR SMS AND AUTO
-                          // if (sms) {
-                          //   setState(() {
-                          //     sms = !sms;
-                          //   });
-                          // } else {
-                          //   // TODO :GO BACK TO SIGNUP
-                          // }
-
-                          // TODO :GO BACK TO SIGNUP
+                        onTap: () async {
+                          print("BACK");
+                          //Ask for logout
+                          bool val = await errorBox(
+                            context,
+                            PlatformException(
+                              code: 'Logout',
+                              message: 'Are you sure you want to logout?',
+                              details: 'double',
+                            ),
+                          );
+                          print(val);
+                          if (val) {
+                            await FirebaseAuth.instance.signOut();
+                            store.clear();
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (context) => UserType(),
+                                ),
+                                (route) => false);
+                          }
                         },
+
+                        //CODE FOR SMS AND AUTO
+                        // if (sms) {
+                        //   setState(() {
+                        //     sms = !sms;
+                        //   });
+                        // } else {
+                        //   // GO BACK TO USERTYPE
+                        // }
                         child: Icon(
                           Icons.arrow_back,
                           size: 32,
@@ -324,8 +380,6 @@ class _OTP1State extends State<OTP1> {
     );
   }
 }
-
-// TODO : CHECK FOR THE SMS VERIFICATION UPDATE AS IT IS NOT YET IMPLEMENTED CAN ONLY GIVE AUTO VERIFICATION
 
 // Widget _buildSMS() => Column(
 //       children: [

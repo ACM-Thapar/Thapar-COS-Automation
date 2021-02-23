@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../Variables.dart';
 import '../Builder.dart';
+import 'package:provider/provider.dart';
+import '../../Services/User.dart';
 
 class Intro2 extends StatefulWidget {
   @override
@@ -47,18 +48,14 @@ class _Intro2State extends State<Intro2> {
                       textAlign: TextAlign.center,
                       text: TextSpan(
                           text: 'Redeem Points\n',
-                          style: GoogleFonts.josefinSans(
-                            fontSize: 43,
-                            fontWeight: FontWeight.bold,
+                          style: josefinSansB37.copyWith(
                             color: Colors.black,
                           ),
                           children: [
                             TextSpan(
                               text:
                                   'Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit',
-                              style: GoogleFonts.josefinSans(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
+                              style: josefinSansSB10.copyWith(
                                 color: Color(0xc2606060),
                               ),
                             ),
@@ -88,8 +85,8 @@ class _Intro2State extends State<Intro2> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ProfileBuilder(
-                            type: !store.getBool('userType'),
-                          ),
+                              appUser:
+                                  Provider.of<AppUser>(context, listen: false)),
                         ),
                       );
                     },
