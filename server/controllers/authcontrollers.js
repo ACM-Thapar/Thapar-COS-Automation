@@ -106,7 +106,6 @@ module.exports.firebaseRegisterShopkeeper = async (req, res) => {
 // @route    POST /api/auth/register
 // @access   Public
 module.exports.post_login = async (req, res) => {
-  [];
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });

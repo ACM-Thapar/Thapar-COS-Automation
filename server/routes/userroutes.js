@@ -28,18 +28,8 @@ router.post(
 );
 router.post('/verify-otp', [protectUser], userController.verifyOtp);
 router.put('/regenerate-otp', [protectUser], userController.regenerateOtp);
-router.get(
-  '/me',
-  [check('email', 'Must be a valid email ').isEmail()],
-  [protectUser],
-  userController.getMe,
-);
-router.put(
-  '/complete-profile',
-  [check('email', 'Must be a valid email ').isEmail()],
-  [protectUser],
-  userController.completeProfile,
-);
+router.get('/me', [protectUser], userController.getMe);
+router.put('/complete-profile', [protectUser], userController.completeProfile);
 
 // auth with google
 router.get(
