@@ -12,7 +12,8 @@ const shopSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: false,
+      required: true,
+      enum: ['departmental', 'stationary', 'eateries'],
     },
     phone: {
       type: Number,
