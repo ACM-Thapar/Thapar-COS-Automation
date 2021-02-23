@@ -43,6 +43,22 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: 'COD',
     },
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    discountedAmount: {
+      type: Number,
+      required: true,
+    },
+    pointsEarned: {
+      type: Number,
+      required: true,
+    },
+    pointsUsed: {
+      type: Number,
+      required: true,
+    },
   },
   {
     toJSON: { virtuals: true },
