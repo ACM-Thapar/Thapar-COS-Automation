@@ -168,7 +168,7 @@ module.exports.verifyOtp = async (req, res) => {
       return res.status(401).json({ errors: [{ msg: 'Invalid otp' }] });
     }
 
-    const currentTime = new Date(Date.now());
+    const currentTime = new Date(Date.now()).toISOString();
     if (user.otp.validity < currentTime) {
       return res.status(400).json({ errors: [{ msg: 'OTP has expired' }] });
     }
