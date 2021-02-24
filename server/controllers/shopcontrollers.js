@@ -42,6 +42,7 @@ module.exports.create_shop = async (req, res) => {
         timings,
         capacity,
         address,
+        category,
       });
     }
     console.log(shops);
