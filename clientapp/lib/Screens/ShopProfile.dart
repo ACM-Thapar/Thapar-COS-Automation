@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../Services/ServerRequests.dart';
 import './HomePage.dart';
 import '../Variables.dart';
+import '../WidgetResizing.dart';
+import '../Services/Shop.dart';
 
 class ShopProfile extends StatefulWidget {
   @override
@@ -13,7 +17,16 @@ class _ShopProfileState extends State<ShopProfile> {
   String password;
   bool eText = true, pText = true;
   @override
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+    boxSizeH = SizeConfig.safeBlockHorizontal;
+    boxSizeV = SizeConfig.safeBlockVertical;
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -136,7 +149,32 @@ class _ShopProfileState extends State<ShopProfile> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => WillPopScope(
+                        onWillPop: () =>
+                            Future.delayed(Duration(), () => false),
+                        child: Dialog(
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      ),
+                    );
+                    //GET ALL SHOPS
+                    final List<dynamic> list =
+                        await Provider.of<ServerRequests>(context,
+                                listen: false)
+                            .getShops(store.getString('token'));
+                    list.forEach((element) {
+                      Shop.fromjson(element);
+                      shops.add(Shop.fromjson(element));
+                    });
+                    print(shops.length);
                     Navigator.push(
                       context,
                       MaterialPageRoute(

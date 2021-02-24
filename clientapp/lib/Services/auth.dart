@@ -25,8 +25,9 @@ class Auth {
         print(
             'GOOGLE ERROR CAUGHT CUSTOM ERROR SENT ERROR GIVEN::${e.toString()}');
         throw PlatformException(
-            code: 'Google_Auth_Failed',
-            message: 'Google Authentication Failed');
+            code: 'Authentication Failed',
+            message: 'Google authentication failed. Try again later.',
+            details: 'single');
       }
       try {
         authResult = await FirebaseAuth.instance.signInWithCredential(
@@ -37,19 +38,29 @@ class Auth {
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential')
           throw PlatformException(
-              code:
-                  'Email_Already_In_Use', //ONLY IF ALREADY GOOGLE, PRIORITY ORDER GOOGLE>FB>Email&Pas
-              message: 'There is already an account with this email');
+              code: 'Email already in use',
+              message: 'There is already a user with this email',
+              details:
+                  'single'); //ONLY IF ALREADY GOOGLE, PRIORITY ORDER GOOGLE>FB>Email&Pas
         else if (e.code == 'user-disabled')
-          throw PlatformException(code: e.code, message: e.message);
+          throw PlatformException(
+              code: 'Email Disabled',
+              message: 'This email has been disabled by the App managers.',
+              details: 'single');
         else {
           print('Something went WRONG HERE');
           throw PlatformException(
-              code: 'Google_Auth_Failed',
-              message: 'Google Authentication Failed');
+              code: 'Authentication Failed',
+              message: 'Google authentication failed. Try again later.',
+              details: 'single');
         }
       } catch (error) {
         print(error.toString());
+        throw PlatformException(
+            code: 'Something went wrong',
+            message:
+                'Something went wrong while authenticating with google. Try again later.',
+            details: 'single');
       }
     } else
       throw PlatformException(
