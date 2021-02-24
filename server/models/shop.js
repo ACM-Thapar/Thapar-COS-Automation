@@ -3,7 +3,7 @@ const shopSchema = new mongoose.Schema(
   {
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      require: true,
+      required: true,
       ref: 'shopkeepers',
     },
     name: {
@@ -35,7 +35,7 @@ const shopSchema = new mongoose.Schema(
     },
     capacity: {
       type: Number,
-      default: '',
+      default: null,
     },
     shop_rating: {
       type: Number,
