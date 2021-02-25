@@ -1,3 +1,4 @@
+import 'package:clientapp/Services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,6 @@ import './Tracking.dart';
 import '../ErrorBox.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import './UserType.dart';
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -234,6 +234,9 @@ class _HomePageState extends State<HomePage> {
                                   print(val);
                                   if (val) {
                                     // exit(0);
+                                    await Provider.of<Auth>(context,
+                                            listen: false)
+                                        .logOut();
                                     await store.clear();
                                     Navigator.pushAndRemoveUntil(
                                         context,

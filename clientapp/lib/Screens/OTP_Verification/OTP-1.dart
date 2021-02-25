@@ -1,6 +1,6 @@
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:clientapp/Screens/Intro/Intro1.dart';
 import 'package:clientapp/Services/User.dart';
+import 'package:clientapp/Services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -270,7 +270,7 @@ class _OTP1State extends State<OTP1> {
         );
         print(val);
         if (val) {
-          await FirebaseAuth.instance.signOut();
+          await Provider.of<Auth>(context, listen: false).logOut();
           store.clear();
           // exit(0);
           SystemChannels.platform.invokeMethod('SystemNavigator.pop');
@@ -317,7 +317,8 @@ class _OTP1State extends State<OTP1> {
                           );
                           print(val);
                           if (val) {
-                            await FirebaseAuth.instance.signOut();
+                            await Provider.of<Auth>(context, listen: false)
+                                .logOut();
                             store.clear();
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
