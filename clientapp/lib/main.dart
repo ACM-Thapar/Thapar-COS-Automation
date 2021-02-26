@@ -1,3 +1,4 @@
+import 'package:clientapp/Screens/Cart.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,30 +30,31 @@ class MyApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return MultiProvider(
-      providers: [
-        Provider<ServerRequests>(
-          create: (context) => ServerRequests(),
-        ),
-        Provider<Auth>(
-          create: (context) => Auth(),
-        ),
-        Provider<AppUser>(
-          create: (context) => AppUser(),
-        )
-      ],
-      child: Consumer<ServerRequests>(
-        builder: (context, serverRequests, child) => MaterialApp(
-          theme: ThemeData(
-              primaryColor: Color(0xffFFCB00),
-              cursorColor: Color(0xffFFCB00),
-              accentColor: Color(0xffFFCB00)),
-          title: 'Flutter Demo',
-          home: Consumer<AppUser>(
-              builder: (context, appUser, child) => SplashScreen(
-                  serverRequests: serverRequests, appUser: appUser)),
-        ),
-      ),
-    );
+    return MaterialApp(home: MyCart());
+    // return MultiProvider(
+    //   providers: [
+    //     Provider<ServerRequests>(
+    //       create: (context) => ServerRequests(),
+    //     ),
+    //     Provider<Auth>(
+    //       create: (context) => Auth(),
+    //     ),
+    //     Provider<AppUser>(
+    //       create: (context) => AppUser(),
+    //     )
+    //   ],
+    //   child: Consumer<ServerRequests>(
+    //     builder: (context, serverRequests, child) => MaterialApp(
+    //       theme: ThemeData(
+    //           primaryColor: Color(0xffFFCB00),
+    //           cursorColor: Color(0xffFFCB00),
+    //           accentColor: Color(0xffFFCB00)),
+    //       title: 'Flutter Demo',
+    //       home: Consumer<AppUser>(
+    //           builder: (context, appUser, child) => SplashScreen(
+    //               serverRequests: serverRequests, appUser: appUser)),
+    //     ),
+    //   ),
+    // );
   }
 }
