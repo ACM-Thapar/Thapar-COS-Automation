@@ -30,7 +30,8 @@ router.post('/verify-otp', [protectUser], userController.verifyOtp);
 router.put('/regenerate-otp', [protectUser], userController.regenerateOtp);
 router.get('/me', [protectUser], userController.getMe);
 router.put('/complete-profile', [protectUser], userController.completeProfile);
-
+router.post('/favorite/:id', [protectUser], userController.favorite);
+router.get('/showFavorites', [protectUser], userController.showFavorites);
 // auth with google
 router.get(
   '/google',
