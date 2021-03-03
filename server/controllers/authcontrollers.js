@@ -106,7 +106,6 @@ module.exports.firebaseRegisterShopkeeper = async (req, res) => {
 // @route    POST /api/auth/register
 // @access   Public
 module.exports.post_login = async (req, res) => {
-  [];
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -156,7 +155,7 @@ module.exports.verifyOtp = async (req, res) => {
       return res.status(401).json({ errors: [{ msg: 'Invalid otp' }] });
     }
 
-    const currentTime = new Date(Date.now());
+    const currentTime = new Date(Date.now()).toISOString();
     if (shopkeeper.otp.validity < currentTime) {
       return res.status(400).json({ errors: [{ msg: 'OTP has expired' }] });
     }

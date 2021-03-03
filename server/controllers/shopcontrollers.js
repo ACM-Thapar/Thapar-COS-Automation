@@ -13,7 +13,7 @@ module.exports.create_shop = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, phone, timings, capacity, address } = req.body;
+  const { name, phone, timings, capacity, address, category } = req.body;
   try {
     let shops = await Shop.findOne({
       name,
@@ -31,6 +31,7 @@ module.exports.create_shop = async (req, res) => {
         timings,
         capacity,
         address,
+        category,
         photo: req.file.url,
       });
     } else if (!req.file) {
@@ -41,6 +42,7 @@ module.exports.create_shop = async (req, res) => {
         timings,
         capacity,
         address,
+        category,
       });
     }
     console.log(shops);

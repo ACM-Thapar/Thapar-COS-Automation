@@ -2,6 +2,7 @@ import 'package:clientapp/Screens/LoginPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../ErrorBox.dart';
 import '../Variables.dart';
 import '../WidgetResizing.dart';
 
@@ -23,10 +24,23 @@ class _UserTypeState extends State<UserType> {
     boxSizeH = SizeConfig.safeBlockHorizontal;
     boxSizeV = SizeConfig.safeBlockVertical;
     return WillPopScope(
-      onWillPop: () {
+      onWillPop: () async {
         //EXIT APP ERROR
         // print('EXIT APP');
-        return Future.delayed(Duration(milliseconds: 2), () => false);
+        bool val = await errorBox(
+          context,
+          PlatformException(
+            code: 'Exit',
+            message: 'Are you sure you want to exit the app?',
+            details: 'double',
+          ),
+        );
+        print(val);
+        if (val) {
+          // exit(0);
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        }
+        return false;
       },
       child: SafeArea(
         child: Scaffold(
@@ -42,12 +56,14 @@ class _UserTypeState extends State<UserType> {
                   margin: EdgeInsets.only(top: 60 / 6.4 * boxSizeV),
                   child: Column(
                     children: [
-                      Text(
-                        'Who am I ?',
-                        style: TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
+                      Container(
+                        alignment: Alignment.center,
+                        height: 45 / 6.4 * boxSizeV,
+                        // decoration: BoxDecoration(border: Border.all()),
+                        child: Text(
+                          'Who am I ?',
+                          style: robotoB45.copyWith(
+                              letterSpacing: 2, color: Colors.black),
                         ),
                       ),
                       Container(
@@ -64,10 +80,7 @@ class _UserTypeState extends State<UserType> {
                         ),
                         child: Text(
                           'User',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold),
+                          style: robotoB37.copyWith(color: Colors.black),
                         ),
                       ),
                       Container(
@@ -84,10 +97,7 @@ class _UserTypeState extends State<UserType> {
                         ),
                         child: Text(
                           'Shopkeeper',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold),
+                          style: robotoB37.copyWith(color: Colors.black),
                         ),
                       ),
                     ],
@@ -108,7 +118,7 @@ class _UserTypeState extends State<UserType> {
                 ),
                 Container(
                   margin: EdgeInsets.only(
-                    top: 125 / 6.4 * boxSizeV,
+                    top: 131 / 6.4 * boxSizeV,
                     left: 48 / 3.6 * boxSizeH,
                   ),
                   child: Column(
@@ -129,7 +139,7 @@ class _UserTypeState extends State<UserType> {
                           width: 263 / 3.6 * boxSizeH,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Color(0xffCBCBCB)),
+                            // border: Border.all(color: Color(0xffCBCBCB)),
                             color: Colors.transparent,
                           ),
                         ),
@@ -153,7 +163,7 @@ class _UserTypeState extends State<UserType> {
                           ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Color(0xffCBCBCB)),
+                            // border: Border.all(color: Color(0xffCBCBCB)),
                             color: Colors.transparent,
                           ),
                         ),

@@ -7,8 +7,8 @@ class AppUser {
   String _password;
   String _phone;
   String hostel;
-  // bool user; REMOVED SAVED IN SHAREDPREFERENCES
-  // bool gSign = true; REMOVED THIS CAN USE FIREBASE ISEMAILVERIFIED method
+  String pic;
+  bool gSign = false;
 
   void _setProfile({
     String name,
@@ -27,12 +27,20 @@ class AppUser {
   String get password => this._password;
   String get phone => this._phone;
 
+  void setPhone(String phone) {
+    this._phone = phone;
+  }
+
+  void setName(String name) {
+    this._name = name;
+  }
+
   void fromServer(String json) {
     final res = jsonDecode(json)['data'];
     this._setProfile(
       name: res['name'],
       email: res['email'],
-      phone: res['phone'],
+      phone: res['phone'].toString(),
       password: res['password'],
     );
     this.hostel = res['hostel'];
@@ -45,6 +53,7 @@ class AppUser {
       password: firebaseUser.uid,
       phone: firebaseUser.phoneNumber,
     );
+    this.pic = firebaseUser.photoURL;
   }
 
   void fromForm({

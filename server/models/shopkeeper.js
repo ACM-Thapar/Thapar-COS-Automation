@@ -39,10 +39,6 @@ const shopkeeperSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    shop: {
-      type: String,
-      id: String,
-    },
     isGoogleUser: {
       type: Boolean,
       default: false,

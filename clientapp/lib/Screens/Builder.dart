@@ -1,35 +1,81 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
-import 'package:google_fonts/google_fonts.dart';
+import '../ErrorBox.dart';
 import '../Variables.dart';
 import './HomePage.dart';
-import './ShopProfile.dart';
 import '../Services/User.dart';
 import '../Services/ServerRequests.dart';
+import './ShopProfile.dart';
+import '../Services/Shop.dart';
+import '../WidgetResizing.dart';
 
 // TODO: REDESIGN ALL TEXTFIELD HERE
 
 class ProfileBuilder extends StatefulWidget {
-  ProfileBuilder({this.type});
-  final bool type;
+  final AppUser appUser;
+  ProfileBuilder({@required this.appUser});
   @override
   _ProfileBuilderState createState() => _ProfileBuilderState();
 }
 
 class _ProfileBuilderState extends State<ProfileBuilder> {
+  String _hostel = 'A', _name;
+  TextEditingController _nameController, _emailController, _phoneController;
+  List<String> hostelList = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'PG',
+    'FRD',
+    'FRE',
+    'Day Scholar',
+  ];
+  @override
+  void initState() {
+    _nameController = TextEditingController(text: widget.appUser.name);
+    _emailController = TextEditingController(text: widget.appUser.email);
+    _phoneController = TextEditingController(text: widget.appUser.phone);
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+    boxSizeH = SizeConfig.safeBlockHorizontal;
+    boxSizeV = SizeConfig.safeBlockVertical;
     return WillPopScope(
-      onWillPop: () => Future.delayed(
-        Duration(),
-        () => true,
-      ),
+      onWillPop: () async {
+        bool val = await errorBox(
+          context,
+          PlatformException(
+            code: 'Exit',
+            message: 'Are you sure you want to exit?',
+            details: 'double',
+          ),
+        );
+        print(val);
+        if (val) {
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        }
+        return false;
+      },
       child: SafeArea(
         child: Scaffold(
+          backgroundColor: Colors.white,
           body: SingleChildScrollView(
             child: Container(
               width: 290 / 3.6 * boxSizeH,
@@ -42,11 +88,10 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                 children: [
                   Container(
                     child: Text(
-                      widget.type ? 'Shopkeeper Details' : 'User Details',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 41,
-                      ),
+                      store.getBool('userType')
+                          ? 'User Details'
+                          : 'Shopkeeper Details',
+                      style: robotoB37.copyWith(color: Colors.black),
                     ),
                   ),
                   Container(
@@ -63,7 +108,9 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                           width: 89 / 3.6 * boxSizeH,
                           decoration: BoxDecoration(
                             color: Colors.black,
-                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: Color(0xffFFCB00), width: 2.8),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           child: Icon(
                             MdiIcons.cameraEnhanceOutline,
@@ -77,11 +124,31 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                             right: 20 / 3.6 * boxSizeH,
                           ),
                           child: TextField(
-                            enabled: false,
+                            onChanged: (val) {
+                              _name = val;
+                            },
+                            onSubmitted: (v) {
+                              print(v);
+                              if (v == '' || v == null) {
+                                _nameController.text = widget.appUser.name;
+                              }
+                            },
+                            controller: _nameController,
+                            keyboardType: TextInputType.name,
+                            cursorColor: Color(0xffFFCB00),
                             decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                              hintText: 'Name',
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  width: 1,
+                                  color: Color(0xffFFCB00),
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.only(bottom: 4),
+                              labelText: 'Name',
+                              hintText: widget.appUser.name,
+                              labelStyle: openSansL14.copyWith(
+                                color: Color(0xAB707070),
+                              ),
                             ),
                           ),
                         ),
@@ -89,66 +156,67 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                     ),
                   ),
                   SizedBox(
-                    height: 12.5 / 6.4 * boxSizeV,
+                    height: 35 / 6.4 * boxSizeV,
                   ),
                   TextField(
+                    controller: _emailController,
                     enabled: false,
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Email',
-                    ),
+                        contentPadding: EdgeInsets.only(bottom: 4),
+                        labelText: 'Email',
+                        labelStyle:
+                            openSansL14.copyWith(color: Color(0xAB707070))),
                   ),
                   SizedBox(
-                    height: 25,
+                    height: 35 / 6.4 * boxSizeV,
                   ),
                   TextField(
+                    controller: _phoneController,
                     enabled: false,
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Contact No.',
-                    ),
+                        contentPadding: EdgeInsets.only(bottom: 4),
+                        labelText: 'Contact No.',
+                        labelStyle:
+                            openSansL14.copyWith(color: Color(0xAB707070))),
                   ),
                   SizedBox(
-                    height: 25,
+                    height: 25 / 6.4 * boxSizeV,
                   ),
-                  TextField(
-                    //TODO: MAKE THIS A DROPODOWN
-                    decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Hostel',
-                      suffixIcon: Icon(Icons.arrow_drop_down),
-                    ),
-                  ),
+                  store.getBool('userType')
+                      ? DropdownButtonFormField<String>(
+                          style: openSansR14.copyWith(color: Colors.black),
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            labelText: 'Hostel',
+                            labelStyle:
+                                openSansL14.copyWith(color: Color(0xAB707070)),
+                          ),
+                          icon: Icon(Icons.arrow_drop_down),
+                          items: hostelList
+                              .map((value) => DropdownMenuItem(
+                                    child: Text(value.toString()),
+                                    value: value,
+                                  ))
+                              .toList(),
+                          onChanged: (String value) {
+                            setState(() {
+                              _hostel = value;
+                            });
+                          },
+                          value: _hostel,
+                        )
+                      : Container(),
                   SizedBox(
-                    height: 25,
-                  ),
-                  // TextField(
-                  //   decoration: InputDecoration(
-                  //     contentPadding:
-                  //         EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                  //     hintText: 'Joined On',
-                  //   ),
-                  // ),
-                  Container(
-                    //TODO: CHANGE THIS TO REQUIRED ONLY WHEN NOT GOOGLESIGNED IN (APPUSER HAS A BOOL GSIGN)
-                    margin: EdgeInsets.only(top: 32),
-                    child: Text(
-                      'Change Password ?',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    height: 25 / 6.4 * boxSizeV,
                   ),
                   GestureDetector(
                     onTap: () async {
+                      if (_name != null && _name != '') {
+                        Provider.of<AppUser>(context, listen: false)
+                            .setName(_name);
+                      }
                       Provider.of<AppUser>(context, listen: false).hostel =
-                          'H'; //TODO REMOVE THIS AND PLACE AT CORRECT POSITION
-                      // Provider.of<AppUser>(context, listen: false)
-                      //     .printUser();
+                          _hostel;
                       showDialog(
                         barrierDismissible: false,
                         context: context,
@@ -164,51 +232,43 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                           ),
                         ),
                       );
-
-                      if (FirebaseAuth.instance.currentUser.emailVerified) {
-                        bool success;
-                        try {
-                          success = await Provider.of<ServerRequests>(context,
-                                  listen: false)
-                              .registerGoogle(
-                                  Provider.of<AppUser>(context, listen: false));
-                        } on PlatformException catch (e) {
-                          //TODO SHOW ERROR
-                          print(e.message);
-                          success = false;
+                      bool success;
+                      try {
+                        success = await Provider.of<ServerRequests>(context,
+                                listen: false)
+                            .updateProfile(
+                                Provider.of<AppUser>(context, listen: false));
+                      } on PlatformException catch (e) {
+                        Navigator.pop(context); //Remove circular indicator
+                        //SHOW ERROR
+                        await errorBox(context, e);
+                        print(e.message);
+                        success = false;
+                      }
+                      if (success) {
+                        //GET ALL SHOPS
+                        if (store.getBool('userType')) {
+                          final List<dynamic> list =
+                              await Provider.of<ServerRequests>(context,
+                                      listen: false)
+                                  .getShops(store.getString('token'));
+                          list.forEach((element) {
+                            Shop.fromjson(element);
+                            shops.add(Shop.fromjson(element));
+                          });
                         }
-                        if (success) {
-                          Navigator.pop(context);
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                              (_) => false);
-                        }
-                      } else {
-                        bool success;
-                        try {
-                          success = await Provider.of<ServerRequests>(context,
-                                  listen: false)
-                              .updateProfile(
-                                  Provider.of<AppUser>(context, listen: false));
-                        } on PlatformException catch (e) {
-                          //TODO SHOW ERROR
-                          print(e.message);
-                          success = false;
-                        }
-                        if (success) {
-                          Navigator.pop(context);
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                              (_) => false);
-                        }
+                        Navigator.pop(context);
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => store.getBool('userType')
+                                  ? HomePage()
+                                  : ShopProfile(),
+                            ),
+                            (_) => false);
                       }
                     },
                     child: Container(
-                      margin: EdgeInsets.only(top: 25),
+                      margin: EdgeInsets.only(top: 35),
                       alignment: Alignment.center,
                       width: 291 * boxSizeH / 3.6,
                       height: 58 * boxSizeV / 6.4,
@@ -218,10 +278,8 @@ class _ProfileBuilderState extends State<ProfileBuilder> {
                       ),
                       child: Text(
                         'Save',
-                        style: GoogleFonts.josefinSans(
-                          fontSize: 25,
+                        style: josefinSansR18.copyWith(
                           color: Colors.white,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

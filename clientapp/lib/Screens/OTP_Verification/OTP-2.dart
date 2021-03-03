@@ -1,12 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:clientapp/ErrorBox.dart';
 import 'package:clientapp/Services/ServerRequests.dart';
 import 'package:clientapp/Variables.dart';
 import 'package:flutter/services.dart';
-import '../Intro/Intro1.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:provider/provider.dart';
 import '../../Services/User.dart';
+import '../../WidgetResizing.dart';
+import '../UserType.dart';
 import './OTP-1.dart';
 
 //TODO: ADD BTN FOR RESEND OTP
@@ -16,15 +18,43 @@ class OTP2 extends StatefulWidget {
 }
 
 class _OTP2State extends State<OTP2> {
-  String _otp;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  String _otp = '';
+  bool validate = false;
+  @override
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+    boxSizeH = SizeConfig.safeBlockHorizontal;
+    boxSizeV = SizeConfig.safeBlockVertical;
     return WillPopScope(
-      onWillPop: () =>
-          Future.delayed(Duration(), () => false), //TODO : ASK LOGOUT
+      //Logout and EXIT
+      onWillPop: () async {
+        bool val = await errorBox(
+          context,
+          PlatformException(
+            code: 'Logout & Exit',
+            message: 'Are you sure you want to logout and exit?',
+            details: 'double',
+          ),
+        );
+        print(val);
+        if (val) {
+          await FirebaseAuth.instance.signOut();
+          store.clear();
+          // exit(0);
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        }
+        return false;
+      },
       child: SafeArea(
         child: Scaffold(
+          key: _scaffoldKey,
           body: Container(
             height: 100 * boxSizeV,
             width: 100 * boxSizeH,
@@ -37,9 +67,27 @@ class _OTP2State extends State<OTP2> {
                   Container(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           print("BACK");
-                          //TODO : Ask for logout
+                          //Ask for logout
+                          bool val = await errorBox(
+                            context,
+                            PlatformException(
+                              code: 'Logout',
+                              message: 'Are you sure you want to logout?',
+                              details: 'double',
+                            ),
+                          );
+                          print(val);
+                          if (val) {
+                            await FirebaseAuth.instance.signOut();
+                            store.clear();
+                          }
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (context) => UserType(),
+                              ),
+                              (route) => false);
                         },
                         child: Icon(
                           Icons.arrow_back,
@@ -64,8 +112,7 @@ class _OTP2State extends State<OTP2> {
                   Container(
                     child: Text(
                       'OTP Verification',
-                      style: GoogleFonts.josefinSans(
-                          fontSize: 28, fontWeight: FontWeight.w900),
+                      style: josefinSansB28,
                     ),
                   ),
                   SizedBox(
@@ -79,15 +126,17 @@ class _OTP2State extends State<OTP2> {
                       textAlign: TextAlign.center,
                       text: TextSpan(
                         text: 'Enter the OTP sent to\n',
-                        style: GoogleFonts.josefinSans(
-                            fontSize: 22, color: Colors.black54),
+                        style: josefinSansSB14.copyWith(
+                          color: Color(0xff707070),
+                        ),
                         children: [
                           TextSpan(
-                              text: Provider.of<AppUser>(context, listen: false)
-                                  .email,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
+                            text: Provider.of<AppUser>(context, listen: false)
+                                .email,
+                            style: josefinSansB14.copyWith(
+                              color: Colors.black,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -100,85 +149,71 @@ class _OTP2State extends State<OTP2> {
                     keyboardType: TextInputType.text,
                     width: 300 * boxSizeH / 3.6,
                     fieldWidth: 40 * boxSizeH / 3.6,
-                    style: GoogleFonts.josefinSans(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Colors.black),
+                    style: josefinSansB31.copyWith(color: Colors.black),
                     length: 6,
                     textFieldAlignment: MainAxisAlignment.spaceAround,
                     onChanged: (v) {
-                      v = _otp;
+                      _otp = v;
+                      if (_otp.length == 6)
+                        validate = true;
+                      else
+                        validate = false;
                     },
                     onCompleted: (v) async {
-                      v = _otp;
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => WillPopScope(
-                          onWillPop: () =>
-                              Future.delayed(Duration(), () => false),
-                          child: Dialog(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                        ),
-                      );
-                      bool success;
-                      try {
-                        success = await Provider.of<ServerRequests>(context,
-                                listen: false)
-                            .checkOTP(_otp);
-                      } on PlatformException catch (e) {
-                        //TODO SHOW ERROR
-                        //If error is otp expired then Implement resend otp in error box
-                        print(e.message);
-                        success = false;
-                      }
-                      if (success) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => OTP1(),
-                          ),
-                        );
-                      }
+                      _otp = v;
+                      if (_otp.length == 6)
+                        validate = true;
+                      else
+                        validate = false;
                     },
                   )),
                   SizedBox(height: 34.5 * boxSizeV / 6.4),
                   GestureDetector(
                     onTap: () async {
-                      showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) => WillPopScope(
-                          onWillPop: () =>
-                              Future.delayed(Duration(), () => false),
-                          child: Dialog(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            child: Center(
-                              child: CircularProgressIndicator(),
+                      print(_otp);
+                      if (validate) {
+                        showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (context) => WillPopScope(
+                            onWillPop: () =>
+                                Future.delayed(Duration(), () => false),
+                            child: Dialog(
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                      bool success;
-                      try {
-                        success = await Provider.of<ServerRequests>(context,
-                                listen: false)
-                            .checkOTP(_otp);
-                      } on PlatformException catch (e) {
-                        //TODO SHOW ERROR
-                        //If error is otp expired then Implement resend otp in error box
-                        print(e.message);
-                        success = false;
-                      }
-                      if (success) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => OTP1(),
+                        );
+                        bool success;
+                        try {
+                          success = await Provider.of<ServerRequests>(context,
+                                  listen: false)
+                              .checkOTP(_otp);
+                        } on PlatformException catch (e) {
+                          //TODO Impliment RESEND OTP BTN
+                          print(e.code);
+                          await errorBox(context, e);
+                          success = false;
+                          Navigator.pop(context);
+                        }
+                        if (success) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => OTP1(),
+                            ),
+                          );
+                        }
+                      } else {
+                        _scaffoldKey.currentState.showSnackBar(
+                          SnackBar(
+                            duration: Duration(seconds: 1),
+                            content: Text(
+                              'Enter the complete OTP',
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         );
                       }
@@ -193,10 +228,8 @@ class _OTP2State extends State<OTP2> {
                       ),
                       child: Text(
                         'Verify and Proceed',
-                        style: GoogleFonts.josefinSans(
-                          fontSize: 24,
+                        style: josefinSansR18.copyWith(
                           color: Colors.white,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

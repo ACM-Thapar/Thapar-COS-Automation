@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../Services/ServerRequests.dart';
 import './HomePage.dart';
 import '../Variables.dart';
+import '../WidgetResizing.dart';
+import '../Services/Shop.dart';
 
 class ShopProfile extends StatefulWidget {
   @override
@@ -13,7 +17,16 @@ class _ShopProfileState extends State<ShopProfile> {
   String password;
   bool eText = true, pText = true;
   @override
+  void initState() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+    boxSizeH = SizeConfig.safeBlockHorizontal;
+    boxSizeV = SizeConfig.safeBlockVertical;
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -42,9 +55,8 @@ class _ShopProfileState extends State<ShopProfile> {
                   ),
                   child: TextField(
                     decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                      hintText: 'Name',
+                      contentPadding: EdgeInsets.only(bottom: 4),
+                      labelText: 'Name',
                     ),
                   ),
                 ),
@@ -60,9 +72,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         width: 90.5 / 3.6 * boxSizeH,
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Shop No.',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Shop No.',
                           ),
                         ),
                       ),
@@ -73,9 +84,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         ),
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Category',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Category',
                             suffixIcon: Icon(
                               Icons.arrow_drop_down,
                             ),
@@ -90,9 +100,8 @@ class _ShopProfileState extends State<ShopProfile> {
                 ),
                 TextField(
                   decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                    hintText: 'Address',
+                    contentPadding: EdgeInsets.only(bottom: 4),
+                    labelText: 'Address',
                   ),
                 ),
                 SizedBox(
@@ -100,9 +109,8 @@ class _ShopProfileState extends State<ShopProfile> {
                 ),
                 TextField(
                   decoration: InputDecoration(
-                    contentPadding:
-                        EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                    hintText: 'Contact No.',
+                    contentPadding: EdgeInsets.only(bottom: 4),
+                    labelText: 'Contact No.',
                   ),
                 ),
                 SizedBox(
@@ -117,9 +125,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         width: 90.5 / 3.6 * boxSizeH,
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Capacity',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Capacity',
                           ),
                         ),
                       ),
@@ -130,9 +137,8 @@ class _ShopProfileState extends State<ShopProfile> {
                         ),
                         child: TextField(
                           decoration: InputDecoration(
-                            contentPadding:
-                                EdgeInsets.only(bottom: 35 / 6.4 * boxSizeV),
-                            hintText: 'Timing',
+                            contentPadding: EdgeInsets.only(bottom: 4),
+                            labelText: 'Timing',
                             suffixIcon: Icon(
                               Icons.arrow_drop_down,
                             ),
@@ -143,7 +149,32 @@ class _ShopProfileState extends State<ShopProfile> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => WillPopScope(
+                        onWillPop: () =>
+                            Future.delayed(Duration(), () => false),
+                        child: Dialog(
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                      ),
+                    );
+                    //GET ALL SHOPS
+                    final List<dynamic> list =
+                        await Provider.of<ServerRequests>(context,
+                                listen: false)
+                            .getShops(store.getString('token'));
+                    list.forEach((element) {
+                      Shop.fromjson(element);
+                      shops.add(Shop.fromjson(element));
+                    });
+                    print(shops.length);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
