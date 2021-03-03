@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+
   // Added otp
   otp: {
     code: {

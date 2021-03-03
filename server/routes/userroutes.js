@@ -34,6 +34,8 @@ router.get(
   [protectUser],
   userController.getMe,
 );
+router.post('/favorite/:id', [protectUser], userController.favorite);
+router.get('/showFavorites', [protectUser], userController.showFavorites);
 router.put(
   '/complete-profile',
   [check('email', 'Must be a valid email ').isEmail()],
