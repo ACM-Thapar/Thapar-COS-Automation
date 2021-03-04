@@ -8,6 +8,7 @@ import './User.dart';
 class ServerRequests {
   final String _url = 'https://protected-oasis-19586.herokuapp.com/api';
 
+// TODO: status code 500-server error always
   Future<bool> registerGoogle(AppUser appUser) async {
     print('GsignUp SENT');
     http.Response res = await http.post(

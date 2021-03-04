@@ -32,7 +32,7 @@ class Auth {
       try {
         authResult = await FirebaseAuth.instance.signInWithCredential(
           GoogleAuthProvider.credential(
-              idToken: null,
+              idToken: googleSignInAuthentication.idToken,
               accessToken: googleSignInAuthentication.accessToken),
         );
       } on FirebaseAuthException catch (e) {
@@ -61,12 +61,19 @@ class Auth {
             message:
                 'Something went wrong while authenticating with google. Try again later.',
             details: 'single');
+      } finally {
+        await googleSignIn.signOut();
       }
     } else
       throw PlatformException(
           code: 'Error_Aborted_by_User',
-          message:
-              'Sign in aborted by user'); //NEVER CAUGHT IN APP  ONLY WHEN DEBUGGING IT CATCHES THE EXCEPTION
+          message: 'Sign in aborted by user',
+          details: 'single');
     return authResult;
+  }
+
+  Future<void> logOut() async {
+    // await googleSignIn.disconnect();
+    return await FirebaseAuth.instance.signOut();
   }
 }

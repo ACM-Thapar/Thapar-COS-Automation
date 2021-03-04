@@ -5,7 +5,8 @@ class Shop {
   String _address;
   String _pic;
   // String _fav;
-  // String _shopNum;
+  // String _shopNum; remove this
+  int _capacity;
   String _category;
   String _rating;
   String _phone;
@@ -13,6 +14,7 @@ class Shop {
   // List<Review> _reviews;
   //MENU
 
+  int get capacity => _capacity;
   String get pic => _pic;
   // String get fav => _fav;
   // String get shopNum => _shopNum;
