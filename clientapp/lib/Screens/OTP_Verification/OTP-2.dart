@@ -1,3 +1,4 @@
+import 'package:clientapp/Services/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:clientapp/ErrorBox.dart';
 import 'package:clientapp/Services/ServerRequests.dart';
@@ -45,7 +46,7 @@ class _OTP2State extends State<OTP2> {
         );
         print(val);
         if (val) {
-          await FirebaseAuth.instance.signOut();
+          await Provider.of<Auth>(context, listen: false).logOut();
           store.clear();
           // exit(0);
           SystemChannels.platform.invokeMethod('SystemNavigator.pop');
@@ -80,7 +81,8 @@ class _OTP2State extends State<OTP2> {
                           );
                           print(val);
                           if (val) {
-                            await FirebaseAuth.instance.signOut();
+                            await Provider.of<Auth>(context, listen: false)
+                                .logOut();
                             store.clear();
                           }
                           Navigator.of(context).pushAndRemoveUntil(

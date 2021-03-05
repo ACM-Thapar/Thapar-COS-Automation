@@ -16,6 +16,7 @@ import './HomePage.dart';
 import 'Builder.dart';
 import 'OTP_Verification/OTP-1.dart';
 import 'OTP_Verification/OTP-2.dart';
+import '../Services/Shop.dart';
 import 'ShopProfile.dart';
 
 class LoginPage extends StatefulWidget {
@@ -352,7 +353,8 @@ class _LoginPageState extends State<LoginPage> {
                                   } else if (jsonObj['data']['verified'] ==
                                           true &&
                                       jsonObj['data']['phone'] != null &&
-                                      jsonObj['data']['hostel'] == null) {
+                                      jsonObj['data']['hostel'] == null &&
+                                      store.getBool('userType')) {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -366,10 +368,10 @@ class _LoginPageState extends State<LoginPage> {
                                   } else {
                                     //FULL USER PROFILE COMPLETE
                                     //SHOPKEEPER CHECK
-                                    List<dynamic> shops =
+                                    List<dynamic> shopkeeperShops =
                                         jsonObj['data']['shops'];
                                     if (store.getBool('userType') == false &&
-                                        shops.isEmpty) {
+                                        shopkeeperShops.isEmpty) {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -377,7 +379,16 @@ class _LoginPageState extends State<LoginPage> {
                                               ShopProfile(),
                                         ),
                                       );
-                                    } else
+                                    } else {
+                                      //GET ALL SHOPS
+                                      final List<dynamic> list = await Provider
+                                              .of<ServerRequests>(context,
+                                                  listen: false)
+                                          .getShops(store.getString('token'));
+                                      list.forEach((element) {
+                                        Shop.fromjson(element);
+                                        shops.add(Shop.fromjson(element));
+                                      });
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -385,6 +396,7 @@ class _LoginPageState extends State<LoginPage> {
                                               HomePage(),
                                         ),
                                       );
+                                    }
                                   }
                                 }
                               }
@@ -579,7 +591,8 @@ class _LoginPageState extends State<LoginPage> {
                                   } else if (jsonObj['data']['verified'] ==
                                           true &&
                                       jsonObj['data']['phone'] != null &&
-                                      jsonObj['data']['hostel'] == null) {
+                                      jsonObj['data']['hostel'] == null &&
+                                      store.getBool('userType')) {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -591,12 +604,14 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     );
                                   } else {
+                                    print('WORKS');
                                     //FULL USER PROFILE COMPLETE
                                     //SHOPKEEPER CHECK
-                                    List<dynamic> shops =
+                                    List<dynamic> shopkeeperShops =
                                         jsonObj['data']['shops'];
                                     if (store.getBool('userType') == false &&
-                                        shops.isEmpty) {
+                                        shopkeeperShops.isEmpty) {
+                                      print('WO');
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -604,7 +619,16 @@ class _LoginPageState extends State<LoginPage> {
                                               ShopProfile(),
                                         ),
                                       );
-                                    } else
+                                    } else {
+                                      //GET ALL SHOPS
+                                      final List<dynamic> list = await Provider
+                                              .of<ServerRequests>(context,
+                                                  listen: false)
+                                          .getShops(store.getString('token'));
+                                      list.forEach((element) {
+                                        Shop.fromjson(element);
+                                        shops.add(Shop.fromjson(element));
+                                      });
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -612,6 +636,7 @@ class _LoginPageState extends State<LoginPage> {
                                               HomePage(),
                                         ),
                                       );
+                                    }
                                   }
                                 }
                               }

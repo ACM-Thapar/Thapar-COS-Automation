@@ -1,6 +1,7 @@
 // *Utils
 const { check, validationResult } = require('express-validator');
 const sendEmail = require('../utils/sendEmail');
+const ErrorResponse = require('../utils/errorResponse');
 
 // *NPM Packages
 const jwt = require('jsonwebtoken');
@@ -17,7 +18,7 @@ const Favoriteshop = require('../models/favoriteshop');
 // @desc     Register User
 // @route    POST /api/user/signup
 // @access   Public
-module.exports.post_signup = async (req, res) => {
+module.exports.post_signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -28,7 +29,7 @@ module.exports.post_signup = async (req, res) => {
   try {
     // Domain check for thapar.edu
     if (!email.includes('@thapar.edu')) {
-      return res.status(400).json('Enter a thapar edu email');
+      return next(new ErrorResponse('Enter thapar mail id', 400));
     }
 
     let [user, shopkeeper] = await Promise.all([
@@ -36,12 +37,15 @@ module.exports.post_signup = async (req, res) => {
       Shopkeeper.findOne({ email: email }).lean().exec(),
     ]);
     if (user) {
-      return res.status(400).json('user already exists');
+      return next(new ErrorResponse('User already exists', 400));
     }
     if (shopkeeper) {
-      return res
-        .status(400)
-        .json('shopkeeper with the same email already exists');
+      return next(
+        new ErrorResponse(
+          'Shopkeeper with the same email id already exists',
+          400,
+        ),
+      );
     }
 
     //Generating an otp
@@ -69,14 +73,14 @@ module.exports.post_signup = async (req, res) => {
     sendTokenResponse(user, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Register Firebase User
 // @route    POST /api/user/firebase-signup
 // @access   Public
-module.exports.firebaseRegister = async (req, res) => {
+module.exports.firebaseRegister = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -87,7 +91,7 @@ module.exports.firebaseRegister = async (req, res) => {
   try {
     // Domain check for thapar.edu
     if (!email.includes('@thapar.edu')) {
-      return res.status(400).json('Enter a thapar edu email');
+      return next(new ErrorResponse('Enter thapar mail id', 400));
     }
 
     let [user, shopkeeper] = await Promise.all([
@@ -95,12 +99,15 @@ module.exports.firebaseRegister = async (req, res) => {
       Shopkeeper.findOne({ email: email }).lean().exec(),
     ]);
     if (user) {
-      return res.status(400).json('user already exists');
+      return next(new ErrorResponse('User already exists', 400));
     }
     if (shopkeeper) {
-      return res
-        .status(400)
-        .json('shopkeeper with the same email already exists');
+      return next(
+        new ErrorResponse(
+          'Shopkeeper with the same email id already exists',
+          400,
+        ),
+      );
     }
 
     const newBody = {
@@ -115,14 +122,14 @@ module.exports.firebaseRegister = async (req, res) => {
     sendTokenResponse(user, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Login User
 // @route    POST /api/user/login
 // @access   Public
-module.exports.post_login = async (req, res) => {
+module.exports.post_login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -133,23 +140,23 @@ module.exports.post_login = async (req, res) => {
     let user = await User.findOne({ email: email });
 
     if (!user) {
-      return res.status(400).json({ errors: [{ msg: 'invalid credentials' }] });
+      return next(new ErrorResponse('User does not exist', 400));
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ errors: [{ msg: 'invalid credentials' }] });
+      return next(new ErrorResponse('Invalid credentials', 400));
     }
     sendTokenResponse(user, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Verify Otp
 // @route    POST /api/user/verify-otp
 // @access   Private
-module.exports.verifyOtp = async (req, res) => {
+module.exports.verifyOtp = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
 
@@ -160,19 +167,19 @@ module.exports.verifyOtp = async (req, res) => {
     const { otp } = req.body;
 
     if (user.verified === true) {
-      return res.status(400).json({ errors: [{ msg: 'Already verified' }] });
+      return next(new ErrorResponse('Already verified', 400));
     }
 
     // Check if otp matches
     const isMatch = await user.matchOtp(otp);
 
     if (!isMatch) {
-      return res.status(401).json({ errors: [{ msg: 'Invalid otp' }] });
+      return next(new ErrorResponse('Invalid otp', 401));
     }
 
     const currentTime = new Date(Date.now()).toISOString();
     if (user.otp.validity < currentTime) {
-      return res.status(400).json({ errors: [{ msg: 'OTP has expired' }] });
+      return next(new ErrorResponse('Otp has expired', 400));
     }
 
     user.verified = true;
@@ -180,25 +187,23 @@ module.exports.verifyOtp = async (req, res) => {
     return res.status(200).json({ message: 'Sucessfully Verified' });
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Regenerate Otp
 // @route    PUT /api/user/regenerate-otp
 // @access   Private
-module.exports.regenerateOtp = async (req, res) => {
+module.exports.regenerateOtp = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(400).json({ errors: [{ msg: 'User does not exist' }] });
+      return next(new ErrorResponse('User does not exist', 400));
     }
 
     // if user is already verified
     if (user.verified === true) {
-      return res
-        .status(400)
-        .json({ errors: [{ msg: 'User already verified' }] });
+      return next(new ErrorResponse('User already verified', 400));
     }
 
     user.otp.code = undefined;
@@ -224,7 +229,7 @@ module.exports.regenerateOtp = async (req, res) => {
     sendTokenResponse(user, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
@@ -232,15 +237,12 @@ module.exports.regenerateOtp = async (req, res) => {
 // @route    GET /api/user/me
 // @access   Private
 
-module.exports.getMe = async (req, res) => {
+module.exports.getMe = async (req, res, next) => {
   try {
     console.log(req.user);
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        data: 'No user found',
-      });
+      return next(new ErrorResponse('No user found', 400));
     }
     res.status(200).json({
       success: true,
@@ -248,7 +250,7 @@ module.exports.getMe = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ success: false, data: err });
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
@@ -256,13 +258,10 @@ module.exports.getMe = async (req, res) => {
 // @route    PUT /api/user/complete-profile
 // @access   Private
 
-module.exports.completeProfile = async (req, res) => {
+module.exports.completeProfile = async (req, res, next) => {
   try {
     if (req.body.email) {
-      return res.status(400).json({
-        success: false,
-        data: 'Email cannot be updated',
-      });
+      return next(new ErrorResponse('Email id cannot be updated', 400));
     }
     const updateData = { ...req.body };
     const user = await User.findByIdAndUpdate(req.user.id, updateData, {
@@ -271,10 +270,7 @@ module.exports.completeProfile = async (req, res) => {
     }).exec();
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        data: 'No user found',
-      });
+      return next(new ErrorResponse('No user found', 400));
     }
     const status = user.isCompleted;
 
@@ -285,7 +281,7 @@ module.exports.completeProfile = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ success: false, data: err });
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 //Favorite a shop and get the favourite shops
