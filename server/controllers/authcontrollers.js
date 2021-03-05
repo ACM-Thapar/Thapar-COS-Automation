@@ -1,6 +1,7 @@
 // * Utils
 const { check, validationResult } = require('express-validator');
 const sendEmail = require('../utils/sendEmail');
+const ErrorResponse = require('../utils/errorResponse');
 
 // * NPM Packages
 const bcrypt = require('bcryptjs');
@@ -16,7 +17,7 @@ const User = require('../models/user');
 // @desc     Register Shopkeeper
 // @route    POST /api/auth/signup
 // @access   Public
-module.exports.post_signup = async (req, res) => {
+module.exports.post_signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -30,10 +31,12 @@ module.exports.post_signup = async (req, res) => {
       Shopkeeper.findOne({ email: email }).lean().exec(),
     ]);
     if (shopkeeper) {
-      return res.status(400).json('user already exists');
+      return next(new ErrorResponse('User already exists', 400));
     }
     if (user) {
-      return res.status(400).json('user with the same email already exists');
+      return next(
+        new ErrorResponse('User with same email already exists', 400),
+      );
     }
     //Generating an otp
     const otp = otpGenerator.generate(6, {
@@ -59,14 +62,14 @@ module.exports.post_signup = async (req, res) => {
     sendTokenResponse(shopkeeper, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Register Firebase Shopkeeper
 // @route    POST /api/auth/firebase-signup
 // @access   Public
-module.exports.firebaseRegisterShopkeeper = async (req, res) => {
+module.exports.firebaseRegisterShopkeeper = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -80,10 +83,12 @@ module.exports.firebaseRegisterShopkeeper = async (req, res) => {
       Shopkeeper.findOne({ email: email }).lean().exec(),
     ]);
     if (shopkeeper) {
-      return res.status(400).json('user already exists');
+      return next(new ErrorResponse('User already exists', 400));
     }
     if (user) {
-      return res.status(400).json('user with the same email already exists');
+      return next(
+        new ErrorResponse('User with same email already exists', 400),
+      );
     }
 
     const newBody = {
@@ -98,14 +103,14 @@ module.exports.firebaseRegisterShopkeeper = async (req, res) => {
     sendTokenResponse(shopkeeper, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Login Shopkeeper
 // @route    POST /api/auth/register
 // @access   Public
-module.exports.post_login = async (req, res) => {
+module.exports.post_login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -118,23 +123,23 @@ module.exports.post_login = async (req, res) => {
     let shopkeeper = await Shopkeeper.findOne({ email: email });
     console.log(shopkeeper);
     if (!shopkeeper) {
-      return res.status(400).json({ errors: [{ msg: 'invalid credentials' }] });
+      return next(new ErrorResponse('User does not exist', 400));
     }
     const isMatch = await bcrypt.compare(password, shopkeeper.password);
     if (!isMatch) {
-      return res.status(400).json({ errors: [{ msg: 'invalid credentials' }] });
+      return next(new ErrorResponse('Invalid credentials', 400));
     }
     sendTokenResponse(shopkeeper, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Verify Otp
 // @route    POST /api/auth/verify-otp
 // @access   Private
-module.exports.verifyOtp = async (req, res) => {
+module.exports.verifyOtp = async (req, res, next) => {
   try {
     const shopkeeper = await Shopkeeper.findById(req.user.id);
 
@@ -145,19 +150,19 @@ module.exports.verifyOtp = async (req, res) => {
     const { otp } = req.body;
 
     if (shopkeeper.verified === true) {
-      return res.status(400).json({ errors: [{ msg: 'Already verified' }] });
+      return next(new ErrorResponse('Already verified', 400));
     }
 
     // Check if otp matches
     const isMatch = await shopkeeper.matchOtp(otp);
 
     if (!isMatch) {
-      return res.status(401).json({ errors: [{ msg: 'Invalid otp' }] });
+      return next(new ErrorResponse('Invalid otp', 401));
     }
 
     const currentTime = new Date(Date.now()).toISOString();
     if (shopkeeper.otp.validity < currentTime) {
-      return res.status(400).json({ errors: [{ msg: 'OTP has expired' }] });
+      return next(new ErrorResponse('Otp has expired', 400));
     }
 
     shopkeeper.verified = true;
@@ -165,25 +170,23 @@ module.exports.verifyOtp = async (req, res) => {
     return res.status(200).json({ message: 'Sucessfully Verified' });
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
 // @desc     Regenerate Otp
 // @route    PUT /api/auth/regenerate-otp
 // @access   Private
-module.exports.regenerateOtp = async (req, res) => {
+module.exports.regenerateOtp = async (req, res, next) => {
   try {
     const shopkeeper = await Shopkeeper.findById(req.user.id);
     if (!shopkeeper) {
-      return res.status(400).json({ errors: [{ msg: 'User does not exist' }] });
+      return next(new ErrorResponse('User does not exist', 400));
     }
 
     // if user is already verified
     if (shopkeeper.verified === true) {
-      return res
-        .status(400)
-        .json({ errors: [{ msg: 'User already verified' }] });
+      return next(new ErrorResponse('User already verified', 400));
     }
 
     shopkeeper.otp.code = undefined;
@@ -209,7 +212,7 @@ module.exports.regenerateOtp = async (req, res) => {
     sendTokenResponse(shopkeeper, 200, req, res);
   } catch (err) {
     console.log(err);
-    res.status(500).send('server error');
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
@@ -217,15 +220,12 @@ module.exports.regenerateOtp = async (req, res) => {
 // @route    GET /api/auth/me
 // @access   Private
 
-module.exports.getMe = async (req, res) => {
+module.exports.getMe = async (req, res, next) => {
   try {
     console.log(req.user);
     const user = await Shopkeeper.findById(req.user.id).populate('shops');
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        data: 'No user found',
-      });
+      return next(new ErrorResponse('User not found', 400));
     }
     res.status(200).json({
       success: true,
@@ -233,7 +233,7 @@ module.exports.getMe = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ success: false, data: err });
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
@@ -241,13 +241,10 @@ module.exports.getMe = async (req, res) => {
 // @route    PUT /api/auth/complete-profile
 // @access   Private
 
-module.exports.completeProfile = async (req, res) => {
+module.exports.completeProfile = async (req, res, next) => {
   try {
     if (req.body.email) {
-      return res.status(400).json({
-        success: false,
-        data: 'Email cannot be updated',
-      });
+      return next(new ErrorResponse('Email cannot be updated', 400));
     }
     const updateData = { ...req.body };
     const user = await Shopkeeper.findByIdAndUpdate(req.user.id, updateData, {
@@ -256,10 +253,7 @@ module.exports.completeProfile = async (req, res) => {
     }).exec();
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        data: 'No user found',
-      });
+      return next(new ErrorResponse('User not found', 400));
     }
     const status = user.isCompleted;
 
@@ -270,7 +264,7 @@ module.exports.completeProfile = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ success: false, data: err });
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
