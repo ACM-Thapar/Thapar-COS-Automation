@@ -2,8 +2,8 @@
 const jwt = require('jsonwebtoken');
 
 // *Models
-const User = require('../models/user');
-const Shopkeeper = require('../models/shopkeeper');
+const { User } = require('../models/user');
+const { Shopkeeper } = require('../models/shopkeeper');
 
 // Protect routes for user
 exports.protectUser = async (req, res, next) => {
