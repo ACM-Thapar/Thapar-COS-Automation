@@ -1,9 +1,13 @@
+// ! Needs to be fixed
+
 // *NPM Packages
 const jwt = require('jsonwebtoken');
 
-// *Models
-const { User } = require('../models/user');
-const { Shopkeeper } = require('../models/shopkeeper');
+// * Utils
+
+// * Models
+const User = require('../models/User');
+const Shopkeeper = require('../models/Shopkeeper');
 
 // Protect routes for user
 exports.protectUser = async (req, res, next) => {

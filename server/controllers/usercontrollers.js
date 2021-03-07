@@ -11,8 +11,8 @@ const nodemailer = require('nodemailer');
 const compareAsc = require('date-fns/compareAsc');
 
 // *Models
-const User = require('../models/user');
-const Shopkeeper = require('../models/shopkeeper');
+const { User } = require('../models/user');
+const { Shopkeeper } = require('../models/shopkeeper');
 
 // @desc     Register User
 // @route    POST /api/user/signup

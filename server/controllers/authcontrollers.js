@@ -12,8 +12,8 @@ const OAuth2 = google.auth.OAuth2;
 const compareAsc = require('date-fns/compareAsc');
 
 // * Models
-const Shopkeeper = require('../models/shopkeeper');
-const User = require('../models/user');
+const { Shopkeeper } = require('../models/shopkeeper');
+const { User } = require('../models/user');
 
 // @desc     Register Shopkeeper
 // @route    POST /api/auth/signup
