@@ -9,6 +9,7 @@ const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
+const compareAsc = require('date-fns/compareAsc');
 
 // * Models
 const Shopkeeper = require('../models/shopkeeper');
@@ -160,8 +161,9 @@ module.exports.verifyOtp = async (req, res, next) => {
       return next(new ErrorResponse('Invalid otp', 401));
     }
 
-    const currentTime = new Date(Date.now()).toISOString();
-    if (shopkeeper.otp.validity < currentTime) {
+    const currentTime = new Date(Date.now());
+
+    if (compareAsc(new Date(user.otp.validity), currentTime) === -1) {
       return next(new ErrorResponse('Otp has expired', 400));
     }
 

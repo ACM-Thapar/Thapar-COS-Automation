@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
+const compareAsc = require('date-fns/compareAsc');
 
 // *Models
 const User = require('../models/user');
@@ -175,8 +176,9 @@ module.exports.verifyOtp = async (req, res, next) => {
       return next(new ErrorResponse('Invalid otp', 401));
     }
 
-    const currentTime = new Date(Date.now()).toISOString();
-    if (user.otp.validity < currentTime) {
+    const currentTime = new Date(Date.now());
+
+    if (compareAsc(new Date(user.otp.validity), currentTime) === -1) {
       return next(new ErrorResponse('Otp has expired', 400));
     }
 
