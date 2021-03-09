@@ -1,6 +1,6 @@
 // ! Needs to be fixed
 
-// *NPM Packages
+// * NPM Packages
 const jwt = require('jsonwebtoken');
 
 // * Utils

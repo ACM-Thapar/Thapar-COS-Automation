@@ -1,8 +1,10 @@
-class ErrorResponse extends Error {
-  constructor(message, statusCode) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
+const ErrorResponse = (res, message, statusCode) => {
+  res.status(statusCode).json({
+    error: {
+      message,
+      statusCode,
+    },
+  });
+};
 
 module.exports = ErrorResponse;
