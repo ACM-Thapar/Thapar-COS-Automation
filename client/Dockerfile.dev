@@ -1,5 +1,5 @@
 #pulling official node image
-FROM node:alpine
+FROM node:12.16.1-alpine
 
 # set workdir
 WORKDIR "/app"

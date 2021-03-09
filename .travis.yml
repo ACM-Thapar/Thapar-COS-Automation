@@ -23,7 +23,7 @@ jobs:
       before_install:
         - docker build -f ./client/Dockerfile.dev -t acmthapar/thapar-cos-automation-client ./client
       script:
-        - docker run -e CI=true acmthapar/thapar-cos-automation-client npm run test
+        - docker run -e CI=true acmthapar/thapar-cos-automation-client npm run test --passWithNoTests
 
       after_success:
         # - docker build  -t acmthapar/multi-client ./client
