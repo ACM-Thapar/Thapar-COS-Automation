@@ -21,17 +21,17 @@ jobs:
       services:
         - docker
       before_install:
-        - docker build -f ./client/Dockerfile.dev -t acmthapar/Thapar-COS-Automation-client ./client
+        - docker build -f ./client/Dockerfile.dev -t acmthapar/thapar-cos-automation-client ./client
       script:
-        - docker run -e CI=true acmthapar/Thapar-COS-Automation-client npm run test
+        - docker run -e CI=true acmthapar/thapar-cos-automation-client npm run test
 
       after_success:
         # - docker build  -t acmthapar/multi-client ./client
         # - docker build  -t acmthapar/multi-nginx ./nginx
-        - docker build -f ./server/Dockerfile.dev  -t acmthapar/Thapar-COS-Automation-server ./server
+        - docker build -f ./server/Dockerfile.dev  -t acmthapar/thapar-cos-automation-server ./server
         #Login to docker
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
         #push all images to docker hub
         # - docker push acmthapar/multi-client
         # - docker push acmthapar/multi-nginx
-        - docker push acmthapar/Thapar-COS-Automation-server
+        - docker push acmthapar/thapar-cos-automation-server
