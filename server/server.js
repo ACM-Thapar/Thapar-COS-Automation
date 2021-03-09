@@ -49,35 +49,35 @@ app.use((req, res, next) => {
 });
 
 // * Redis Configuration
-const RedisStore = connectRedis(session);
+// const RedisStore = connectRedis(session);
 
 // * Configure redis client
-const redisClient = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-});
+// const redisClient = redis.createClient({
+//   host: process.env.REDIS_HOST,
+//   port: process.env.REDIS_PORT,
+// });
 
-redisClient.on('error', function (err) {
-  console.log('Could not establish a connection with redis. ' + err);
-});
-redisClient.on('connect', function (err) {
-  console.log('Connected to redis successfully');
-});
+// redisClient.on('error', function (err) {
+//   console.log('Could not establish a connection with redis. ' + err);
+// });
+// redisClient.on('connect', function (err) {
+//   console.log('Connected to redis successfully');
+// });
 
 // * Configure session middleware
-app.use(
-  session({
-    store: new RedisStore({ client: redisClient }),
-    secret: process.env.COOKIE_KEY,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // if true only transmit cookie over https
-      httpOnly: true, // if true prevent client side JS from reading the cookie
-      maxAge: 24 * 60 * 60 * 1000, // session max age in miliseconds
-    },
-  }),
-);
+// app.use(
+//   session({
+//     store: new RedisStore({ client: redisClient }),
+//     secret: process.env.COOKIE_KEY,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: false, // if true only transmit cookie over https
+//       httpOnly: true, // if true prevent client side JS from reading the cookie
+//       maxAge: 24 * 60 * 60 * 1000, // session max age in miliseconds
+//     },
+//   }),
+// );
 
 //initiaise passport
 app.use(passport.initialize());
