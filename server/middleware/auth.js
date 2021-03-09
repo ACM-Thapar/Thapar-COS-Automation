@@ -8,7 +8,6 @@ const { Shopkeeper } = require('../models/shopkeeper');
 // Protect routes for user
 exports.protectUser = async (req, res, next) => {
   let token;
-
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
@@ -38,7 +37,6 @@ exports.protectUser = async (req, res, next) => {
       console.log(decoded);
 
       req.user = await User.findById(decoded.id);
-
       next();
     }
   } catch (err) {
