@@ -2,10 +2,36 @@ dist: xenial
 group: edge
 jobs:
   include:
-    - language: python
+    - stage: Tests
+      name: Pre-commit Tests
+      language: python
       python: '3.7'
       cache: pip
       install:
         - pip install pre-commit
       script:
         - pre-commit run --all-files
+
+    - stage: Build
+      name: Build docker Images
+      sudo: required
+      language: node_js
+      node_js:
+        - 7
+      services:
+        - docker
+      before_install:
+        - docker build -f ./client/Dockerfile.dev -t acmthapar/Thapar-COS-Automation-client ./client
+      script:
+        - docker run -e CI=true acmthapar/Thapar-COS-Automation-client npm run test
+
+      after_success:
+        # - docker build  -t acmthapar/multi-client ./client
+        # - docker build  -t acmthapar/multi-nginx ./nginx
+        - docker build -f ./server/Dockerfile.dev  -t acmthapar/Thapar-COS-Automation-server ./server
+        #Login to docker
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+        #push all images to docker hub
+        # - docker push acmthapar/multi-client
+        # - docker push acmthapar/multi-nginx
+        - docker push acmthapar/Thapar-COS-Automation-server
