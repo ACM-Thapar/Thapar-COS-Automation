@@ -163,7 +163,7 @@ module.exports.verifyOtp = async (req, res, next) => {
 
     const currentTime = new Date(Date.now());
 
-    if (compareAsc(new Date(user.otp.validity), currentTime) === -1) {
+    if (compareAsc(new Date(shopkeeper.otp.validity), currentTime) === -1) {
       return next(new ErrorResponse('Otp has expired', 400));
     }
 
