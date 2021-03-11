@@ -8,6 +8,8 @@ const chatDb = process.env.CHAT_DB;
 function makeNewConnection(uri) {
   const db = mongoose.createConnection(uri, {
     useNewUrlParser: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
     useUnifiedTopology: true,
   });
 

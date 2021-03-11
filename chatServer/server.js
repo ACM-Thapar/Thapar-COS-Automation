@@ -11,6 +11,10 @@ require('dotenv').config({ path: __dirname + '/.env' });
 // *Routes
 const chatroutes = require('./routes/chatroutes.js');
 
+// *Models
+const Message = require('./models/Message');
+const Conversation = require('./models/Conversation');
+
 const app = express();
 
 const PORT = process.env.PORT || 8000;
@@ -49,6 +53,28 @@ app.use(
 
 // *Routes
 app.use('/chat-api/chat', chatroutes);
+
+const io = require('socket.io')(server);
+
+// Socket work for chats
+// Run when client connects
+io.on('connection', (socket) => {
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+    console.log('Conversation started');
+    // Listen for chat message
+    socket.on('messageServer', async (msg) => {
+      console.log('Received', msg);
+      socket.to(room).emit('messageClient', msg);
+      console.log('Emited', msg);
+      await Message.create(msg);
+    });
+  });
+  // Run when a client disconnects
+  socket.on('disconnect', () => {
+    console.log('Socket io disconnected');
+  });
+});
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
