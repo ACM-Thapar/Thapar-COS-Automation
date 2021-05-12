@@ -148,3 +148,61 @@ module.exports.getreview = async (req, res) => {
     return ErrorResponse(res, 'Server error', 500);
   }
 };
+
+// @desc  get all reviews for a shop
+// @route    PUT /api/review/getreviews/:id
+// @access
+
+module.exports.getreviews = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const shop = await Shop.findById(req.params.id);
+    if (!shop) {
+      // * Throw error if shop doesn't exists
+      return ErrorResponse(res, 'Shop does not exist', 400);
+    }
+    let reviews = await Review.find({ shop: req.params.id });
+    if (!reviews) {
+      // * Throw error if shop doesn't exists
+      return ErrorResponse(res, 'review does not exist', 400);
+    }
+
+    res.status(200).json({ success: true, data: reviews });
+  } catch (err) {
+    console.log(err);
+    return ErrorResponse(res, 'Server error', 500);
+  }
+};
+
+// @desc  get all reviews for a shop
+// @route    GET /api/review/getreviewforall/:id
+// @access
+
+module.exports.getreviewsforall = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const shop = await Shop.findById(req.params.id);
+    if (!shop) {
+      // * Throw error if shop doesn't exists
+      return ErrorResponse(res, 'Shop does not exist', 400);
+    }
+    let reviews = await Review.find({ shop: req.params.id });
+    if (!reviews) {
+      // * Throw error if shop doesn't exists
+      return ErrorResponse(res, 'review does not exist', 400);
+    }
+
+    res.status(200).json({ success: true, data: reviews });
+  } catch (err) {
+    console.log(err);
+    return ErrorResponse(res, 'Server error', 500);
+  }
+};

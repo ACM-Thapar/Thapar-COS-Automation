@@ -285,8 +285,10 @@ module.exports.completeProfile = async (req, res) => {
 //Favorite a shop and get the favourite shops
 module.exports.favorite = async (req, res) => {
   try {
-    let shop = await Shop.findById(req.params.id);
-    let user = await User.findById(req.user.id);
+    const [shop, user] = await Promise.all([
+      Shop.findById(req.params.id),
+      User.findById(req.user.id),
+    ]);
     if (!shop) {
       return res.status(400).json({
         success: false,
