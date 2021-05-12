@@ -1,6 +1,6 @@
 name: build-pipeline
 on:
-  pull_request:
+  push:
     branches:
       - master
       - v*
