@@ -282,6 +282,57 @@ module.exports.completeProfile = async (req, res) => {
     return ErrorResponse(res, 'Server error', 500);
   }
 };
+//Favorite a shop and get the favourite shops
+module.exports.favorite = async (req, res) => {
+  try {
+    const [shop, user] = await Promise.all([
+      Shop.findById(req.params.id),
+      User.findById(req.user.id),
+    ]);
+    if (!shop) {
+      return res.status(400).json({
+        success: false,
+        data: 'This shop does not exist',
+      });
+    }
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        data: 'user does not exist',
+      });
+    }
+    const newBody = {
+      shop: shop,
+      user: user,
+    };
+    favorite = await Favoriteshop.create(newBody);
+    // prints "The author is Ian Fleming"
+    console.log(favorite + ' added');
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false, data: err });
+  }
+};
+//Show favorite shops
+module.exports.showFavorites = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const favoriteshops = await Favoriteshop.find({ user: user }).populate(
+      'shop',
+    );
+    if (!favoriteshops) {
+      return res.status(400).json({
+        success: false,
+        data: 'No favorite shops exist',
+      });
+    }
+    res.status(200).json(favoriteshops);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false, data: err });
+  }
+};
 
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, req, res) => {
