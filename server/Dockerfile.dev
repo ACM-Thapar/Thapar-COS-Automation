@@ -1,5 +1,5 @@
 #pulling official node image
-FROM node:12.16.1-alpine
+FROM node:alpine
 
 # set workdir
 WORKDIR "/app"
@@ -14,4 +14,6 @@ RUN npm install
 # copy other files/directories
 COPY . .
 
-CMD ["npm" , "run" ,"dev"]
+EXPOSE 5000
+
+CMD ["npm" , "run" ,"start"]

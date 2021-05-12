@@ -1,6 +1,9 @@
 // *NPM Packages
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
+const redis = require('redis');
+const connectRedis = require('connect-redis');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
@@ -47,8 +50,40 @@ app.use((req, res, next) => {
   next();
 });
 
+// * Redis Configuration
+// const RedisStore = connectRedis(session);
+
+// * Configure redis client
+// const redisClient = redis.createClient({
+//   host: process.env.REDIS_HOST,
+//   port: process.env.REDIS_PORT,
+// });
+
+// redisClient.on('error', function (err) {
+//   console.log('Could not establish a connection with redis. ' + err);
+// });
+// redisClient.on('connect', function (err) {
+//   console.log('Connected to redis successfully');
+// });
+
+// * Configure session middleware
+// app.use(
+//   session({
+//     store: new RedisStore({ client: redisClient }),
+//     secret: process.env.COOKIE_KEY,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: false, // if true only transmit cookie over https
+//       httpOnly: true, // if true prevent client side JS from reading the cookie
+//       maxAge: 24 * 60 * 60 * 1000, // session max age in miliseconds
+//     },
+//   }),
+// );
+
 // Cookie Parser
 app.use(cookieParser());
+
 app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,

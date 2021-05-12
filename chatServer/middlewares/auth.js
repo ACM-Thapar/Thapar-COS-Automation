@@ -1,13 +1,18 @@
-// *NPM Packages
+// ! Needs to be fixed
+
+// * NPM Packages
 const jwt = require('jsonwebtoken');
 
-// *Models
-const { User } = require('../models/user');
-const { Shopkeeper } = require('../models/shopkeeper');
+// * Utils
+
+// * Models
+const User = require('../models/User');
+const Shopkeeper = require('../models/Shopkeeper');
 
 // Protect routes for user
 exports.protectUser = async (req, res, next) => {
   let token;
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
@@ -37,6 +42,7 @@ exports.protectUser = async (req, res, next) => {
       console.log(decoded);
 
       req.user = await User.findById(decoded.id);
+
       next();
     }
   } catch (err) {

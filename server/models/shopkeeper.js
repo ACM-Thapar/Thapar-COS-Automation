@@ -98,4 +98,4 @@ shopkeeperSchema.virtual('isCompleted').get(function () {
 });
 
 const Shopkeeper = mongoose.model('shopkeepers', shopkeeperSchema);
-module.exports = Shopkeeper;
+module.exports = { Shopkeeper, shopkeeperSchema };
