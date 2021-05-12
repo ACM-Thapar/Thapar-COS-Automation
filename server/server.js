@@ -19,6 +19,7 @@ const userroutes = require('./routes/userroutes.js');
 const shoproutes = require('./routes/shoproutes.js');
 const inventoryroutes = require('./routes/inventoryroutes');
 const orderroutes = require('./routes/orderroutes.js');
+const reviewroutes = require('./routes/reviewroutes.js');
 
 const app = express();
 
@@ -101,6 +102,7 @@ app.use('/api/user', userroutes);
 app.use('/api/shop', shoproutes);
 app.use('/api/inventory', inventoryroutes);
 app.use('/api/order', orderroutes);
+app.use('/api/review', reviewroutes);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
