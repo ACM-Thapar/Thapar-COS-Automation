@@ -4,6 +4,8 @@ const cors = require('cors');
 const session = require('express-session');
 const redis = require('redis');
 const connectRedis = require('connect-redis');
+const cookieSession = require('cookie-session');
+const cookieParser = require('cookie-parser');
 const passport = require('passport');
 
 // *Config
@@ -78,6 +80,16 @@ app.use((req, res, next) => {
 //     },
 //   }),
 // );
+
+// Cookie Parser
+app.use(cookieParser());
+
+app.use(
+  cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [process.env.COOKIE_KEY],
+  }),
+);
 
 //initiaise passport
 app.use(passport.initialize());

@@ -17,6 +17,8 @@
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.24.0",
     "connect-redis": "^5.1.0",
+    "cookie-parser": "^1.4.5",
+    "cookie-session": "^1.4.0",
     "cors": "^2.8.5",
     "datauri": "^3.0.0",
     "date-fns": "^2.19.0",
@@ -39,6 +41,5 @@
     "hooks": {
       "pre-commit": "pretty-quick --staged"
     }
-  },
-  "devDependencies": {}
+  }
 }
