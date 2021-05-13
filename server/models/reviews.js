@@ -23,12 +23,12 @@ const ReviewSchema = new mongoose.Schema({
   },
   shop: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Shop',
+    ref: 'shops',
     required: true,
   },
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
+    ref: 'users',
     required: true,
   },
 });
@@ -51,7 +51,7 @@ ReviewSchema.statics.getAverageRating = async function (shopId) {
   ]);
 
   try {
-    await this.model('shop').findByIdAndUpdate(shopId, {
+    await this.model('shops').findByIdAndUpdate(shopId, {
       averageRating: obj[0].averageRating,
     });
   } catch (err) {
