@@ -44,6 +44,10 @@ const shopSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    averageRating: {
+      type: Number,
+      default: null,
+    },
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
