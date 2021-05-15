@@ -6,6 +6,7 @@ const ErrorResponse = require('../utils/errorResponse');
 
 // * Models
 const Shop = require('../models/shop');
+const FavoriteShop = require('../models/favoriteshop');
 
 // Route for shop profile creation by user
 module.exports.create_shop = async (req, res) => {
@@ -128,12 +129,33 @@ module.exports.deleteshop = async (req, res) => {
   }
 };
 
-//Getting all shops for DashBoard display
+// @desc     Get all shops(unauthenticated) || Get all shops catered to a particular user
+// @route    GET /api/shop/getAllShops || GET /api/shop/getAllShopsTimeline
+// @access   Public || Private
 module.exports.get_all = async (req, res) => {
   try {
     const allShops = await Shop.find({}).lean();
     if (!allShops) {
       return ErrorResponse(res, 'No shop exist', 400);
+    }
+    if (req.user) {
+      const newData = [];
+      await Promise.all(
+        allShops.map(async (item) => {
+          const isLiked = await FavoriteShop.findOne({
+            shopDetails: item._id,
+            user: req.user.id,
+          })
+            .lean()
+            .exec();
+          item.isFavourited = false;
+          if (isLiked) {
+            item.isFavourited = true;
+          }
+          newData.push(item);
+        }),
+      );
+      return res.status(200).json({ sucess: true, data: newData });
     }
     return res.status(200).json({ sucess: true, data: allShops });
   } catch (err) {
@@ -142,14 +164,27 @@ module.exports.get_all = async (req, res) => {
   }
 };
 
-// @desc     Get a shop by Id
-// @route    GET /api/shop/get-shop/:id
-// @access   Public
+// @desc     Get a shop by Id || Get a shop by Id catered to a user
+// @route    GET /api/shop/get-shop/:id || GET /api/shop/get-shop-user/:id
+// @access   Public || Private
 module.exports.getShopById = async (req, res) => {
   try {
     const shop = await Shop.findById(req.params.id).populate('inventory');
     if (!shop) {
       return ErrorResponse(res, 'Shop does not exist', 400);
+    }
+    if (req.user) {
+      let isFavourited = false;
+      const isLiked = await FavoriteShop.findOne({
+        shopDetails: shop._id,
+        user: req.user.id,
+      })
+        .lean()
+        .exec();
+      if (isLiked) {
+        isFavourited = true;
+      }
+      return res.status(200).json({ success: true, data: shop, isFavourited });
     }
     res.status(200).json({ success: true, data: shop });
   } catch (err) {
