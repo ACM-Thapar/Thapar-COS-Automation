@@ -1,5 +1,5 @@
 // *Utils
-const { check, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const sendEmail = require('../utils/sendEmail');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -7,12 +7,13 @@ const ErrorResponse = require('../utils/errorResponse');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const otpGenerator = require('otp-generator');
-const nodemailer = require('nodemailer');
 const compareAsc = require('date-fns/compareAsc');
 
 // *Models
 const { User } = require('../models/user');
 const { Shopkeeper } = require('../models/shopkeeper');
+const FavoriteShop = require('../models/favoriteshop');
+const Shop = require('../models/shop');
 
 // @desc     Register User
 // @route    POST /api/user/signup
@@ -282,36 +283,46 @@ module.exports.completeProfile = async (req, res) => {
     return ErrorResponse(res, 'Server error', 500);
   }
 };
-//Favorite a shop and get the favourite shops
+
+// @desc     Favourite a shop
+// @route    POST /api/user/favorite/:id
+// @access   Private
 module.exports.favorite = async (req, res) => {
   try {
     const [shop, user] = await Promise.all([
-      Shop.findById(req.params.id),
-      User.findById(req.user.id),
+      Shop.findById(req.params.id).lean(),
+      User.findById(req.user.id).lean(),
     ]);
     if (!shop) {
-      return res.status(400).json({
-        success: false,
-        data: 'This shop does not exist',
-      });
+      return ErrorResponse(res, "Shop doesn't exist", 400);
     }
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        data: 'user does not exist',
-      });
+      return ErrorResponse(res, "User doesn't exist", 400);
     }
+
+    const isFavouriteExist = await FavoriteShop.findOne({
+      shopDetails: shop._id,
+      user: user._id,
+    })
+      .lean()
+      .exec();
+
+    // Check if the user has already liked the shop
+    if (isFavouriteExist) {
+      return ErrorResponse(res, 'Already favourited', 400);
+    }
+
     const newBody = {
-      shop: shop,
-      user: user,
+      shopDetails: shop._id,
+      user: user._id,
     };
-    favorite = await Favoriteshop.create(newBody);
-    // prints "The author is Ian Fleming"
+
+    const favorite = await FavoriteShop.create(newBody);
     console.log(favorite + ' added');
     res.status(200).json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ success: false, data: err });
+    return ErrorResponse(res, 'Server Error', 500);
   }
 };
 //Show favorite shops

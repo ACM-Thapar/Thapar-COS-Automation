@@ -10,7 +10,7 @@ const customStorage = require('../config/multer-storage');
 const shopController = require('../controllers/shopcontrollers');
 
 // * Middleware
-const { protectShopkeeper } = require('../middleware/auth');
+const { protectShopkeeper, protectUser } = require('../middleware/auth');
 
 // * Multer Config
 const storage = customStorage({});
@@ -50,6 +50,10 @@ router
   .route('/deleteShop/:id')
   .delete(protectShopkeeper, shopController.deleteshop);
 router.route('/getAllShops').get(shopController.get_all);
+router.route('/getAllShopsTimeline').get([protectUser], shopController.get_all);
 router.route('/get-shop/:id').get(shopController.getShopById);
+router
+  .route('/get-shop-user/:id')
+  .get([protectUser], shopController.getShopById);
 
 module.exports = router;
