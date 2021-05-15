@@ -139,23 +139,18 @@ module.exports.get_all = async (req, res) => {
       return ErrorResponse(res, 'No shop exist', 400);
     }
     if (req.user) {
-      const newData = [];
-      await Promise.all(
-        allShops.map(async (item) => {
-          const isLiked = await FavoriteShop.findOne({
-            shopDetails: item._id,
-            user: req.user.id,
-          })
-            .lean()
-            .exec();
-          item.isFavourited = false;
-          if (isLiked) {
-            item.isFavourited = true;
-          }
-          newData.push(item);
-        }),
-      );
-      return res.status(200).json({ sucess: true, data: newData });
+      const favouriteShops = await FavoriteShop.find({
+        user: req.user.id,
+      })
+        .lean()
+        .exec();
+      const favouriteShopMap = {};
+      favouriteShops.forEach((item) => {
+        favouriteShopMap[item.shopDetails] = true;
+      });
+      allShops.forEach((item) => {
+        item['isFavourited'] = Boolean(favouriteShopMap[item._id]);
+      });
     }
     return res.status(200).json({ sucess: true, data: allShops });
   } catch (err) {
