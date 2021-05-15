@@ -289,20 +289,14 @@ module.exports.completeProfile = async (req, res) => {
 // @access   Private
 module.exports.favorite = async (req, res) => {
   try {
-    const [shop, user] = await Promise.all([
-      Shop.findById(req.params.id).lean(),
-      User.findById(req.user.id).lean(),
-    ]);
+    const shop = await Shop.findById(req.params.id).lean();
     if (!shop) {
       return ErrorResponse(res, "Shop doesn't exist", 400);
-    }
-    if (!user) {
-      return ErrorResponse(res, "User doesn't exist", 400);
     }
 
     const isFavouriteExist = await FavoriteShop.findOne({
       shopDetails: shop._id,
-      user: user._id,
+      user: req.user.id,
     })
       .lean()
       .exec();
@@ -314,7 +308,7 @@ module.exports.favorite = async (req, res) => {
 
     const newBody = {
       shopDetails: shop._id,
-      user: user._id,
+      user: req.user.id,
     };
 
     const favorite = await FavoriteShop.create(newBody);
@@ -325,23 +319,42 @@ module.exports.favorite = async (req, res) => {
     return ErrorResponse(res, 'Server Error', 500);
   }
 };
-//Show favorite shops
+
+// @desc     Get all favourited shops
+// @route    GET /api/user/showFavourites
+// @access   Private
 module.exports.showFavorites = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    const favoriteshops = await Favoriteshop.find({ user: user }).populate(
-      'shop',
-    );
+    const favoriteshops = await FavoriteShop.find({
+      user: req.user.id,
+    }).populate('shopDetails');
     if (!favoriteshops) {
-      return res.status(400).json({
-        success: false,
-        data: 'No favorite shops exist',
-      });
+      return ErrorResponse(res, 'No favourite shops exist', 400);
     }
-    res.status(200).json(favoriteshops);
+    res.status(200).json({ success: true, data: favoriteshops });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ success: false, data: err });
+    return ErrorResponse(res, 'Server Error', 500);
+  }
+};
+
+// @desc     Remove a favourite shop by id
+// @route    DELETE /api/user/favorite/:id
+// @access   Private
+module.exports.removeFavoriteById = async (req, res) => {
+  try {
+    const shop = await Shop.findById(req.params.id).lean();
+    const favoriteshop = await FavoriteShop.deleteOne({
+      shopDetails: shop._id,
+      user: req.user.id,
+    });
+    if (!favoriteshop) {
+      return ErrorResponse(res, 'No favourite shops exist', 400);
+    }
+    res.status(200).json({ success: true, data: 'deleted successfully' });
+  } catch (err) {
+    console.log(err);
+    return ErrorResponse(res, 'Server Error', 500);
   }
 };
 
