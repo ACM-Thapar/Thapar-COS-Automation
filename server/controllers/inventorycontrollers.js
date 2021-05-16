@@ -1,5 +1,5 @@
 // * Utils
-const { check, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const ErrorResponse = require('../utils/errorResponse');
 
 // * NPM Packages
@@ -26,12 +26,31 @@ module.exports.addInventory = async (req, res) => {
         400,
       );
     }
-    console.log(shop, 'shop');
     // Check if the person adding the inventory is the owner of the shop
     if (!shop.owner.equals(req.user.id)) {
       return ErrorResponse(res, 'Not authorized to perform this action', 401);
     }
-    let newBody = { ...body, shop: shop._id, shopOwner: req.user.id };
+    const newCategory = req.body.category.toUpperCase();
+    if (!shop.itemCategories) {
+      return ErrorResponse(
+        res,
+        'Please add a item category for shop first',
+        400,
+      );
+    }
+    if (!shop.itemCategories.includes(newCategory)) {
+      return ErrorResponse(
+        res,
+        'Please enter a valid item category. If you want to add a product in this category, please create the category first',
+        400,
+      );
+    }
+    let newBody = {
+      ...body,
+      shop: shop._id,
+      shopOwner: req.user.id,
+      category: newCategory,
+    };
     const inventoryItem = await Inventory.create(newBody);
     res.status(200).json({ success: true, data: inventoryItem });
   } catch (err) {

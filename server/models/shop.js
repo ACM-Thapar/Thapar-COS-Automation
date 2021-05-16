@@ -48,6 +48,12 @@ const shopSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    itemCategories: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },
 );
