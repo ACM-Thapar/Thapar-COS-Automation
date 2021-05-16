@@ -90,6 +90,9 @@ module.exports.update_shop = async (req, res) => {
   }
 };
 
+// @desc     Add a category to a shop by id
+// @route    POST /api/shop/addShopItemCategory/:id
+// @access   Private
 module.exports.addShopItemCategories = async (req, res) => {
   try {
     let shop = await Shop.findById(req.params.id).lean().exec();
