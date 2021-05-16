@@ -16,6 +16,11 @@ const inventory = new mongoose.Schema(
       required: [true, 'Please add a price for the item'],
       trim: true,
     },
+    category: {
+      type: String,
+      required: [true, 'Please add a category for the item'],
+      trim: true,
+    },
     outOfStock: {
       type: Boolean,
       default: false,
