@@ -1,4 +1,5 @@
 const express = require('express');
+const { check } = require('express-validator');
 
 // * NPM packages
 const multer = require('multer');
@@ -46,7 +47,11 @@ function checkFileType(file, cb) {
 // * API Endpoints -->
 const router = express.Router();
 
-router.post('/add-inventory/:id', [protectShopkeeper, upload], addInventory);
+router.post(
+  '/add-inventory/:id',
+  [check('category', 'Please add an item category'), protectShopkeeper, upload],
+  addInventory,
+);
 router.put(
   '/update-availability/:id',
   [protectShopkeeper],

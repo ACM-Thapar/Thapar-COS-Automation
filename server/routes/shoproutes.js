@@ -45,6 +45,9 @@ router
 router
   .route('/updateShop/:id')
   .put([protectShopkeeper, upload], shopController.update_shop);
+router
+  .route('/addShopItemCategory/:id')
+  .post([protectShopkeeper], shopController.addShopItemCategories);
 router.route('/myShops').get(protectShopkeeper, shopController.myshops);
 router
   .route('/deleteShop/:id')

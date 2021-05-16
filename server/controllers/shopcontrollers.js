@@ -77,6 +77,7 @@ module.exports.update_shop = async (req, res) => {
     if (req.file) {
       req.body.photo = req.file.url;
     }
+
     let shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runVaildators: true,
@@ -85,14 +86,48 @@ module.exports.update_shop = async (req, res) => {
     res.status(200).send(shop);
   } catch (err) {
     console.log(err);
-    return ErrorResponse(res, 'Server error', 500);
+    return ErrorResponse(res, err.message, 500);
+  }
+};
+
+module.exports.addShopItemCategories = async (req, res) => {
+  try {
+    let shop = await Shop.findById(req.params.id).lean().exec();
+    if (!shop) {
+      return ErrorResponse(res, 'Shop profile does not exist', 400);
+    }
+    if (shop.owner.toString() != req.user._id.toString()) {
+      return ErrorResponse(res, 'Only owner can update the shop profile', 400);
+    }
+    if (!req.body.itemCategories) {
+      return ErrorResponse(res, 'Cannot add an empty category', 400);
+    }
+    const newCategory = req.body.itemCategories.toUpperCase();
+
+    if (shop.itemCategories && shop.itemCategories.includes(newCategory)) {
+      return ErrorResponse(res, 'Category already exists', 400);
+    }
+
+    shop = await Shop.findByIdAndUpdate(
+      req.params.id,
+      {
+        $push: { itemCategories: newCategory },
+      },
+      {
+        new: true,
+        runValidators: false,
+      },
+    );
+    res.status(200).json({ success: true, data: shop });
+  } catch (err) {
+    console.log(err);
+    return ErrorResponse(res, err.message, 500);
   }
 };
 
 //Route to display all shop profiles of a paticular shopkeeper
 module.exports.myshops = async (req, res) => {
   try {
-    console.log(req.user._id);
     const myshops = await Shop.find({ owner: req.user._id }).populate(
       'inventory',
     );
