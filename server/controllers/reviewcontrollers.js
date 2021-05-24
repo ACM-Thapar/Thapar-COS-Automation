@@ -71,8 +71,8 @@ module.exports.updatereview = async (req, res) => {
   }
 };
 
-// @desc   delete a  review
-// @route    PUT /api/review/deletereview/:id
+// @desc     delete a  review
+// @route    DELETE /api/review/deletereview/:id
 // @access   Private
 
 module.exports.deletereview = async (req, res) => {
@@ -96,11 +96,11 @@ module.exports.deletereview = async (req, res) => {
   }
 };
 
-// @desc  get all reviews for a shop
-// @route    PUT /api/review/getreviews/:id
+// @desc     Get all reviews for a shop
+// @route    GET /api/review/getreviews/:id
 // @access   Private
 
-module.exports.getreviews = async (req, res) => {
+module.exports.getreviewsByShopId = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -112,7 +112,7 @@ module.exports.getreviews = async (req, res) => {
       // * Throw error if shop doesn't exists
       return ErrorResponse(res, 'Shop does not exist', 400);
     }
-    let reviews = await Review.find({ shop: req.params.id });
+    const reviews = await Review.find({ shop: req.params.id }).populate('user');
     if (!reviews) {
       // * Throw error if shop doesn't exists
       return ErrorResponse(res, 'review does not exist', 400);
@@ -125,9 +125,9 @@ module.exports.getreviews = async (req, res) => {
   }
 };
 
-// @desc  get a single review by review id
+// @desc     Get a single review by review id
 // @route    GET /api/review/getreview/:id
-// @access   Private
+// @access   Public
 
 module.exports.getreview = async (req, res) => {
   const errors = validationResult(req);
@@ -136,7 +136,7 @@ module.exports.getreview = async (req, res) => {
   }
 
   try {
-    const review = await Review.findById(req.params.id);
+    const review = await Review.findById(req.params.id).populate('user');
     if (!review) {
       // * Throw error if shop doesn't exists
       return ErrorResponse(res, 'review does not exist', 400);
@@ -149,38 +149,9 @@ module.exports.getreview = async (req, res) => {
   }
 };
 
-// @desc  get all reviews for a shop
-// @route    PUT /api/review/getreviews/:id
-// @access
-
-module.exports.getreviews = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-    const shop = await Shop.findById(req.params.id);
-    if (!shop) {
-      // * Throw error if shop doesn't exists
-      return ErrorResponse(res, 'Shop does not exist', 400);
-    }
-    let reviews = await Review.find({ shop: req.params.id });
-    if (!reviews) {
-      // * Throw error if shop doesn't exists
-      return ErrorResponse(res, 'review does not exist', 400);
-    }
-
-    res.status(200).json({ success: true, data: reviews });
-  } catch (err) {
-    console.log(err);
-    return ErrorResponse(res, 'Server error', 500);
-  }
-};
-
-// @desc  get all reviews for a shop
+// @desc     get all reviews for a shop
 // @route    GET /api/review/getreviewforall/:id
-// @access
+// @access   Public
 
 module.exports.getreviewsforall = async (req, res) => {
   const errors = validationResult(req);
@@ -194,7 +165,7 @@ module.exports.getreviewsforall = async (req, res) => {
       // * Throw error if shop doesn't exists
       return ErrorResponse(res, 'Shop does not exist', 400);
     }
-    let reviews = await Review.find({ shop: req.params.id });
+    const reviews = await Review.find({ shop: req.params.id }).populate('user');
     if (!reviews) {
       // * Throw error if shop doesn't exists
       return ErrorResponse(res, 'review does not exist', 400);

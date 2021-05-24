@@ -6,7 +6,7 @@ const {
   addreview,
   updatereview,
   deletereview,
-  getreviews,
+  getreviewsByShopId,
   getreview,
   getreviewsforall,
 } = require('../controllers/reviewcontrollers');
@@ -20,7 +20,7 @@ const router = express.Router();
 router.post('/addreview/:id', [protectUser], addreview);
 router.put('/updatereview/:id', [protectUser], updatereview);
 router.delete('/deletereview/:id', [protectUser], deletereview);
-router.get('/getreviews/:id', [protectUser], getreviews);
+router.get('/getreviews/:id', [protectUser], getreviewsByShopId);
 
 //Unaunthenticated Routes
 //To get a single review by id
