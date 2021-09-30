@@ -1,0 +1,548 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../Services/ServerRequests.dart';
+import '../Services/User.dart';
+import '../Services/auth.dart';
+import '../Variables.dart';
+import '../ErrorBox.dart';
+import './OTP_Verification/OTP-2.dart';
+import './OTP_Verification/OTP-1.dart';
+
+class Registeruser extends StatefulWidget {
+  @override
+  _RegisteruserState createState() => _RegisteruserState();
+}
+
+class _RegisteruserState extends State<Registeruser> {
+  FocusNode _emailFocus, _passFocus, _nameFocus, _escapeNode;
+  String _email, _password, _name;
+  TextEditingController _emailController, _nameController, _passwordController;
+  bool eText = true, pText = true, nText = true, hidePass = true;
+
+  @override
+  void initState() {
+    _emailFocus = FocusNode();
+    _escapeNode = FocusNode();
+    _passFocus = FocusNode();
+    _nameFocus = FocusNode();
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      //redirects to login
+      onWillPop: () => Future.delayed(Duration(), () => true),
+      child: SafeArea(
+        child: Scaffold(
+          // resizeToAvoidBottomInset: false,
+          body: SingleChildScrollView(
+            child: Container(
+              child: Stack(
+                children: [
+                  Container(
+                    height: 176 / 6.4 * boxSizeV,
+                    width: 100 * boxSizeH,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        fit: BoxFit.fill,
+                        image: AssetImage('assets/MaskGroup2.png'),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 100 * boxSizeV,
+                    width: 100 * boxSizeH,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(
+                            top: 110 / 6.4 * boxSizeV,
+                            left: 36 / 3.6 * boxSizeH,
+                          ),
+                          child: Text(
+                            'Create A New\nAccount',
+                            style: robotoB37.copyWith(
+                                color: Colors.black, height: 1.3),
+                          ),
+                        ),
+                        Container(
+                          width: 291 / 3.6 * boxSizeH,
+                          margin: EdgeInsets.only(
+                            top: 12 / 6.4 * boxSizeV,
+                            left: 35 / 3.6 * boxSizeH,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(0xffF8F8F8),
+                          ),
+                          child: TextField(
+                            controller: _nameController,
+                            keyboardType: TextInputType.name,
+                            focusNode: _nameFocus,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (value) {
+                              setState(() {
+                                _name = value;
+                                nText = !(_name == null || _name == '');
+                              });
+                            },
+                            onSubmitted: (v) {
+                              print(v);
+                              FocusScope.of(context).requestFocus(_emailFocus);
+                            },
+                            style: openSansR14.copyWith(color: Colors.black),
+                            cursorColor: Color(0xffFFCB00),
+                            decoration: InputDecoration(
+                              hintText: 'Full Name',
+                              errorText: nText ? null : 'Enter Name',
+                              fillColor: Color(0x80F8F8F8),
+                              filled: true,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 0.5,
+                                  color: Color(0xffCBCBCB),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Color(0xffFFCB00),
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              hintStyle: openSansL14.copyWith(
+                                  color: Color(0xAB707070)),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 291 / 3.6 * boxSizeH,
+                          margin: EdgeInsets.only(
+                            top: 13 / 6.4 * boxSizeV,
+                            left: 35 / 3.6 * boxSizeH,
+                          ),
+                          child: TextField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            focusNode: _emailFocus,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (value) {
+                              setState(() {
+                                _email = value;
+                                eText = !(_email == null || _email == '');
+                              });
+                            },
+                            onSubmitted: (v) {
+                              print(v);
+                              FocusScope.of(context).requestFocus(_passFocus);
+                            },
+                            style: openSansR14.copyWith(color: Colors.black),
+                            cursorColor: Color(0xffFFCB00),
+                            decoration: InputDecoration(
+                              hintText: 'Email',
+                              errorText: eText
+                                  ? _email != null
+                                      ? RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@thapar\.edu$")
+                                              .hasMatch(_email)
+                                          ? null
+                                          : 'Please enter valid Thapar email'
+                                      : null
+                                  : 'Enter the email',
+                              fillColor: Color(0x80F8F8F8),
+                              filled: true,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 0.5,
+                                  color: Color(0xffCBCBCB),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Color(0xffFFCB00),
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              hintStyle: openSansL14.copyWith(
+                                  color: Color(0xAB707070)),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 291 / 3.6 * boxSizeH,
+                          margin: EdgeInsets.only(
+                            top: 13 / 6.4 * boxSizeV,
+                            left: 35 / 3.6 * boxSizeH,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(0xffF8F8F8),
+                          ),
+                          child: TextField(
+                            obscureText: hidePass,
+                            controller: _passwordController,
+                            keyboardType: TextInputType.visiblePassword,
+                            focusNode: _passFocus,
+                            textInputAction: TextInputAction.done,
+                            onChanged: (value) {
+                              setState(() {
+                                _password = value;
+                                pText = !(_password == null || _password == '');
+                              });
+                            },
+                            onSubmitted: (v) {
+                              print(v);
+                              FocusScope.of(context).requestFocus(_escapeNode);
+                            },
+                            style: openSansR14.copyWith(color: Colors.black),
+                            cursorColor: Color(0xffFFCB00),
+                            decoration: InputDecoration(
+                              suffixIcon: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    hidePass = !hidePass;
+                                  });
+                                },
+                                child: Icon(
+                                  hidePass
+                                      ? Icons.remove_red_eye
+                                      : Icons.remove_red_eye_outlined,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              hintText: 'Password',
+                              errorText: pText
+                                  ? _password != null
+                                      ? _password.length < 6
+                                          ? 'Password must have atleast 6 characters'
+                                          : null
+                                      : null
+                                  : 'Enter the password',
+                              fillColor: Color(0x80F8F8F8),
+                              filled: true,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 0.5,
+                                  color: Color(0xffCBCBCB),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Color(0xffFFCB00),
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              hintStyle: openSansL14.copyWith(
+                                color: Color(0xAB707070),
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            if (_name != null &&
+                                _password != null &&
+                                _email != null) //CONDITION FOR CHECK FIELDS
+                            {
+                              if (RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@thapar\.edu$")
+                                      .hasMatch(_email) &&
+                                  _password.length > 5) {
+                                showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) => WillPopScope(
+                                    onWillPop: () =>
+                                        Future.delayed(Duration(), () => false),
+                                    child: Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                Provider.of<AppUser>(context, listen: false)
+                                    .fromForm(
+                                  name: _name,
+                                  email: _email,
+                                  password: _password,
+                                ); //SET AppUSER in Provider
+                                bool success;
+                                try {
+                                  success = await Provider.of<ServerRequests>(
+                                          context,
+                                          listen: false)
+                                      .registerForm(Provider.of<AppUser>(
+                                          context,
+                                          listen:
+                                              false)); //SEND EMAIL OTP FROM SERVER
+                                } on PlatformException catch (exp) {
+                                  Navigator.pop(
+                                      context); //Remove Circular Indicator
+                                  //SHOW ERROR
+                                  await errorBox(context, exp);
+                                  success = false;
+                                }
+                                if (success) {
+                                  //FIREBASE REGISTER
+                                  await Provider.of<Auth>(context,
+                                          listen: false)
+                                      .formAuth(
+                                          email: _email,
+                                          password:
+                                              _password); //This Will never throw error
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OTP2(),
+                                    ),
+                                    (_) => false,
+                                  );
+                                }
+                              }
+                            } else
+                              setState(() {
+                                eText = !(_email == null);
+                                pText = !(_password == null);
+
+                                nText = !(_name == null);
+                              });
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 58 / 6.4 * boxSizeV,
+                            width: 291 / 3.6 * boxSizeH,
+                            margin: EdgeInsets.only(
+                              top: 13 / 6.4 * boxSizeV,
+                              left: 35 / 3.6 * boxSizeH,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Color(0xffCBCBCB)),
+                              color: Colors.black,
+                            ),
+                            child: Text(
+                              'Register Now',
+                              style:
+                                  josefinSansR18.copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(
+                              top: 15 / 6.4 * boxSizeV,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Already have an account ? ',
+                                    style: josefinSansSB14.copyWith(
+                                        color: Colors.black)),
+                                GestureDetector(
+                                  onTap: () {
+                                    //BACK TO LOGIN
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Sign In',
+                                      style: josefinSansSB14.copyWith(
+                                          color: Color(0xffFFCB00))),
+                                )
+                              ],
+                            )),
+                        Container(
+                            margin: EdgeInsets.only(
+                              top: 20 / 6.4 * boxSizeV,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  child: Divider(
+                                    thickness: 1,
+                                    color: Color(0x80707070),
+                                  ),
+                                  width: 93 / 3.6 * boxSizeH,
+                                ),
+                                Text(
+                                  ' Or sign in with ',
+                                  style: josefinSansSB14.copyWith(
+                                      color: Colors.black),
+                                ),
+                                SizedBox(
+                                  child: Divider(
+                                    thickness: 1,
+                                    color: Color(0x80707070),
+                                  ),
+                                  width: 93 / 3.6 * boxSizeH,
+                                ),
+                              ],
+                            )),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () async {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) => WillPopScope(
+                                  onWillPop: () =>
+                                      Future.delayed(Duration(), () => false),
+                                  child: Dialog(
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0,
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                ),
+                              );
+                              UserCredential userCredentials;
+                              try {
+                                userCredentials = await Provider.of<Auth>(
+                                        context,
+                                        listen: false)
+                                    .googleAuth(); //GOOGLE SIGN IN TO GET FirebaseUserCredentials
+                              } on PlatformException catch (pltfmError) {
+                                Navigator.pop(
+                                    context); //Remove Circular Indicator
+                                //SHOW ERROR Register
+                                await errorBox(context, pltfmError);
+                              }
+                              if (userCredentials != null) {
+                                User firebaseUser = userCredentials
+                                    .user; //Getting FirebaseUser from Credentials
+                                Provider.of<AppUser>(context, listen: false)
+                                    .fromFirebase(
+                                        firebaseUser); //Setting profile for user
+                                bool success;
+                                try {
+                                  success = await Provider.of<ServerRequests>(
+                                          context,
+                                          listen: false)
+                                      .registerGoogle(Provider.of<AppUser>(
+                                          context,
+                                          listen:
+                                              false)); //CHECKS FOR DUPLICATE USER
+                                } on PlatformException catch (exp) {
+                                  Navigator.pop(
+                                      context); //Remove Circular Indicator
+                                  //SHOW ERROR
+                                  await errorBox(context, exp);
+                                  success = false;
+                                }
+                                if (success) {
+                                  print('Navigating');
+                                  // Provider.of<AppUser>(context, listen: false)
+                                  //     .printUser();
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder: (context) => OTP1(),
+                                    ),
+                                    (_) => false,
+                                  );
+                                }
+                              }
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 38 / 6.4 * boxSizeV,
+                              // width: 132 / 3.6 * boxSizeH,
+                              padding: EdgeInsets.only(
+                                left: 50 / 3.6 * boxSizeH,
+                                right: 60 / 3.6 * boxSizeH,
+                              ),
+                              margin: EdgeInsets.only(
+                                top: 20 / 6.4 * boxSizeV,
+                                left: 80 / 3.6 * boxSizeH,
+                                right: 80 / 3.6 * boxSizeH,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Color(0xffCBCBCB)),
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  // Icon(FontAwesomeIcons.google),
+                                  SvgPicture.asset(
+                                    'assets/google.svg',
+                                    height: 18 * boxSizeV / 6.4,
+                                    width: 18 * boxSizeH / 3.6,
+                                  ),
+                                  Text(
+                                    'Google',
+                                    style: josefinSansR10.copyWith(
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
